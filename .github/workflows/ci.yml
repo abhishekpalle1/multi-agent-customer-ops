@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, type-check, migrate, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Ephemeral PostgreSQL 17 + pgvector, discarded when the job ends. CI never uses the
+    # Supabase databases and receives no database or Gemini secrets.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: support_ops
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d support_ops"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      # Two separate logical databases on the throwaway service.
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/support_ops
+      TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/support_ops_test
+      PGPASSWORD: postgres
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.4.0
+        with:
+          version: "0.13.9"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Create integration-test database
+        run: psql -h localhost -U postgres -d support_ops -v ON_ERROR_STOP=1 -c "CREATE DATABASE support_ops_test"
+
+      - name: Migrate (support_ops)
+        run: make migrate
+
+      - name: Health smoke check (support_ops)
+        run: |
+          uv run --locked uvicorn support_ops.api.main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/health; then
+              echo
+              exit 0
+            fi
+            sleep 1
+          done
+          cat uvicorn.log
+          exit 1
+
+      - name: Lint
+        run: make lint
+
+      - name: Type-check
+        run: make typecheck
+
+      - name: Test (excluding live_llm)
+        run: make test
+        env:
+          ALLOW_TEST_DATABASE_RESET: "true"
