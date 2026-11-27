@@ -19,7 +19,7 @@ Each phase appends: what was built, decisions made, known gaps, verified version
 - Verified versions: Supabase dev and test projects both run PostgreSQL 17.12 with the `vector` extension enabled and verified. Python/package and Gemini model versions to be recorded in Phase 0.
 
 ## Phase 0: Repository bootstrap — IMPLEMENTED, PENDING EXTERNAL VERIFICATION (not complete)
-Branch `feature/p0-bootstrap`. Phase 0 must not be marked complete until the Codespaces/CI checks listed under "Known gaps" pass.
+Branch `feature/p0-bootstrap`. Local/Codespaces verification has passed (see "Verification"). Phase 0 stays pending until both of the following pass: (1) GitHub Actions CI, and (2) the Gemini live smoke tests (`make test-live` / `tasks.ps1 test-live`).
 
 - Built:
   - `pyproject.toml` (uv, Python 3.12, `src/` layout, ruff/mypy/pytest config), `.python-version`, `.env.example` (blank placeholders only), minimal `README.md`.
@@ -33,7 +33,7 @@ Branch `feature/p0-bootstrap`. Phase 0 must not be marked complete until the Cod
   - `.github/copilot-instructions.md`: CI image corrected `pg16` → `pg17` to match architecture §16.1.
 - Decisions:
   - SQLAlchemy kept on the 2.0 line (`>=2.0.58,<2.1`) to match the architecture; 2.1.x deliberately not used.
-  - `openai-agents` and `openai` pinned exactly (provider-adapter sensitive); other direct deps pinned exactly; `uv.lock` will be the source of resolved versions.
+  - `openai-agents` and `openai` pinned exactly (provider-adapter sensitive); other direct deps pinned exactly; `uv.lock` (generated from public PyPI) is the source of truth for the resolved graph.
   - CI: one `pgvector/pgvector:pg17` service with two logical databases: `support_ops` (`DATABASE_URL`: `alembic upgrade head` + `/health` smoke check) and `support_ops_test` (`TEST_DATABASE_URL`: integration tests). This reconciles §16.1 with the §3.2 guard. CI gets no secrets and never uses Supabase; `live_llm` is excluded.
   - Test-database protection: tests resolve the database only via `resolve_test_database_url` (requires non-empty `TEST_DATABASE_URL`; never falls back to `DATABASE_URL`; refuses when both identify the same logical database). Identity = host (case-insensitive), port (default 5432), database, and pooler tenant suffix of the username (`postgres.<project-ref>`); differing roles/passwords on the same database are still refused. Destructive setup must go through `require_destructive_test_reset`, which additionally requires `APP_ENV=test` and `ALLOW_TEST_DATABASE_RESET=true`. Phase 0 performs no destructive reset; the guard is implemented and unit-tested for later phases. `tasks.ps1 test` / `make test` set `APP_ENV=test` for the pytest process only; `ALLOW_TEST_DATABASE_RESET` stays an explicit opt-in.
   - URLs are never printed: errors don't echo them, `/health` logs only the exception type (driver messages can contain the host), and integration-fixture connection failures report only the exception type.
@@ -41,12 +41,24 @@ Branch `feature/p0-bootstrap`. Phase 0 must not be marked complete until the Cod
   - Agents SDK trace export is disabled in the runtime (`set_tracing_disabled(True)`) because the default exporter targets OpenAI's platform; tracing is Phase 6/7.
   - Embeddings request `encoding_format="float"` explicitly (the `openai` client otherwise defaults to base64).
   - No live-LLM GitHub Actions workflow in Phase 0; live tests run locally via `tasks.ps1 test-live` / `make test-live`.
+- Verification:
+  - **Windows laptop (static only):** the laptop's network blocks `files.pythonhosted.org` (TLS handshake fails from uv, PowerShell, and curl; `pypi.org` is reachable), so dependencies cannot be installed there. No internal package index was used or configured. Executed successfully there: `py_compile`/AST parse of all Python files (CPython 3.12.12); TOML parse of `pyproject.toml`; YAML parse of `ci.yml`; `tasks.ps1` parse plus a dry run of every task against a `uv` argument-echo shim; `ruff check` and `ruff format --check` with the official ruff 0.17.6 binary (SHA-256 verified).
+  - **GitHub Codespaces (uv 0.13.9, Python 3.12.3), executed successfully:**
+    - `uv lock` resolved 68 packages from public PyPI. `uv.lock` was scanned: no CNA Artifactory, `cna.com`, JFrog, Supabase host/project reference, password, or token.
+    - `uv sync --locked` installed 64 packages.
+    - `make lint`: `ruff check .` passed; `ruff format --check .` reported 23 files already formatted.
+    - `make typecheck`: mypy (strict) reported no issues in 10 source files.
+    - `make test-unit`: 34 passed.
+    - `make migrate` against the Supabase development database: Alembic applied `0001_enable_pgvector`.
+    - Running app `GET /health`: HTTP 200; app = ok, database = ok, pgvector = ok; pgvector version 0.8.2.
+    - `make test` (run twice, both passed): 40 collected, 4 `live_llm` deselected, 36 selected, 36 passed. The integration health tests ran against `TEST_DATABASE_URL`.
 - Known gaps / pending verification:
-  - **Environment limitation:** the development laptop's network blocks `files.pythonhosted.org` (TLS handshake fails from uv, PowerShell, and curl; `pypi.org` itself is reachable). Dependencies could not be resolved or installed, so **`uv.lock` has not been generated**. No internal package index was used or configured.
-  - **Not executed:** `uv lock`, `uv sync`, mypy, pytest (unit, integration, live), `alembic upgrade head` against the Supabase development or test databases, the `/health` request, and the GitHub Actions workflow.
-  - **Executed successfully:** `py_compile`/AST parse of all Python files (CPython 3.12.12); TOML parse of `pyproject.toml`; YAML parse of `ci.yml`; `tasks.ps1` PowerShell parse plus a dry run of every task against a `uv` argument-echo shim; `ruff check` and `ruff format --check` with the official ruff 0.17.6 Windows binary (SHA-256 verified against the GitHub release), both passing.
-  - Pending: generate `uv.lock` from public PyPI (Codespaces), commit it, then run `make check`, migration, `/health`, and the live smoke test; record the results here.
-- Live Gemini provider tests: **created, not executed.** Model IDs not yet recorded; embedding vector dimension not yet observed. (Final embedding model, output dimension, pgvector column/index settings, and chunking are Phase 4 decisions.)
+  - **GitHub Actions CI: not yet verified.**
+  - **Gemini live smoke tests: created, not executed.** Model IDs not yet recorded; embedding vector dimension not yet observed. (Final embedding model, output dimension, pgvector column/index settings, and chunking are Phase 4 decisions.)
+  - `uv.lock` was generated in Codespaces; it must be committed to `feature/p0-bootstrap` (it was not present in the Windows checkout or on `origin/feature/p0-bootstrap` at `abf2598` when this entry was updated).
 - Versions:
-  - Pinned in `pyproject.toml` (not yet resolved/locked): fastapi 0.165.0, uvicorn 0.54.0, pydantic 2.14.4, pydantic-settings 2.16.3, sqlalchemy >=2.0.58,<2.1, psycopg[binary] 3.3.9, alembic 1.20.1, openai-agents 0.26.0, openai 3.60.0; dev: pytest 9.2.0, pytest-asyncio 1.5.0, httpx 0.29.0, ruff 0.17.6, mypy 2.4.1.
-  - Verified locally: uv 0.13.9, CPython 3.12.12, ruff 0.17.6 (standalone binary). CI pins uv 0.13.9, `actions/checkout@v7`, `astral-sh/setup-uv@v10.4.0`, `pgvector/pgvector:pg17`.
+  - **Direct dependencies (pinned in `pyproject.toml`):** fastapi 0.165.0, uvicorn 0.54.0, pydantic 2.14.4, pydantic-settings 2.16.3, sqlalchemy >=2.0.58,<2.1, psycopg[binary] 3.3.9, alembic 1.20.1, openai-agents 0.26.0, openai 3.60.0; dev group: pytest 9.2.0, pytest-asyncio 1.5.0, httpx 0.29.0, ruff 0.17.6, mypy 2.4.1.
+  - **Resolved dependency graph (`uv.lock`):** 68 packages resolved from public PyPI (64 installed by `uv sync --locked` in Codespaces). `uv.lock` is the authoritative record of every exact resolved version, including the exact SQLAlchemy 2.0.x release; individual resolved versions are not duplicated here.
+  - **Toolchain:** uv 0.13.9 (Windows and Codespaces); CPython 3.12.12 (Windows) and 3.12.3 (Codespaces); ruff 0.17.6. CI pins uv 0.13.9, `actions/checkout@v7`, `astral-sh/setup-uv@v10.4.0`, `pgvector/pgvector:pg17`.
+  - **Database:** Supabase development PostgreSQL 17 with pgvector 0.8.2 (reported by `/health`).
+  - **Gemini model IDs:** not yet recorded (live tests not run).
