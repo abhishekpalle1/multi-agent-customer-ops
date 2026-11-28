@@ -419,14 +419,18 @@ def _create_cases_actions_and_approvals() -> None:
             "action_type <> 'refund' OR (amount IS NOT NULL AND amount > 0)",
         ),
         _ck("actions", "idempotency_key_format", f"idempotency_key ~ '{SHA256_REGEX}'"),
+        # Decision-bearing states require IS NOT NULL explicitly: without it, a NULL decision
+        # makes its branch UNKNOWN rather than FALSE, and PostgreSQL accepts UNKNOWN CHECKs.
         _ck(
             "actions",
             "status_matches_authorization_decision",
             "(status = 'proposed' AND authorization_decision IS NULL) OR "
-            "(status = 'denied' AND authorization_decision = 'deny') OR "
-            "(status IN ('awaiting_approval', 'rejected') "
+            "(status = 'denied' AND authorization_decision IS NOT NULL "
+            "AND authorization_decision = 'deny') OR "
+            "(status IN ('awaiting_approval', 'rejected') AND authorization_decision IS NOT NULL "
             "AND authorization_decision = 'requires_approval') OR "
             "(status IN ('authorized', 'executing', 'succeeded', 'failed', 'unknown') "
+            "AND authorization_decision IS NOT NULL "
             "AND authorization_decision IN ('allow', 'requires_approval'))",
         ),
         _ck(

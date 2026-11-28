@@ -322,13 +322,100 @@ def test_action_idempotency_key_is_globally_unique(db: Connection) -> None:
     assert_rejected(db, statement, UNIQUE, "uq_actions_idempotency_key")
 
 
+def _timestamps_for(status: ActionStatus) -> dict[str, Any]:
+    """Execution/completion timestamps that satisfy their own CHECKs for ``status``."""
+    values: dict[str, Any] = {}
+    if status in {
+        ActionStatus.EXECUTING,
+        ActionStatus.SUCCEEDED,
+        ActionStatus.FAILED,
+        ActionStatus.UNKNOWN,
+    }:
+        values["execution_started_at"] = NOW
+    if status in {ActionStatus.SUCCEEDED, ActionStatus.FAILED}:
+        values["completed_at"] = NOW
+    return values
+
+
+DECISION_REQUIRED_STATUSES = [
+    status for status in ActionStatus if status is not ActionStatus.PROPOSED
+]
+
+
+@pytest.mark.parametrize("status", DECISION_REQUIRED_STATUSES, ids=lambda s: s.value)
+def test_decision_bearing_statuses_reject_a_null_decision(
+    db: Connection, status: ActionStatus
+) -> None:
+    """NULL must make the CHECK FALSE, not UNKNOWN (which PostgreSQL would accept)."""
+    statement = insert(Action).values(
+        **_action("ACT-ITEST-2", KEY_2, status=status, **_timestamps_for(status))
+    )
+    assert_rejected(db, statement, CHECK, "ck_actions_status_matches_authorization_decision")
+
+
+VALID_STATUS_DECISIONS = [
+    (ActionStatus.PROPOSED, None),
+    (ActionStatus.DENIED, AuthorizationDecision.DENY),
+    (ActionStatus.AWAITING_APPROVAL, AuthorizationDecision.REQUIRES_APPROVAL),
+    (ActionStatus.REJECTED, AuthorizationDecision.REQUIRES_APPROVAL),
+    *(
+        (status, decision)
+        for status in (
+            ActionStatus.AUTHORIZED,
+            ActionStatus.EXECUTING,
+            ActionStatus.SUCCEEDED,
+            ActionStatus.FAILED,
+            ActionStatus.UNKNOWN,
+        )
+        for decision in (AuthorizationDecision.ALLOW, AuthorizationDecision.REQUIRES_APPROVAL)
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    ("status", "decision"),
+    VALID_STATUS_DECISIONS,
+    ids=lambda v: v.value if v is not None else "null",
+)
+def test_valid_status_and_decision_combinations_are_accepted(
+    db: Connection, status: ActionStatus, decision: AuthorizationDecision | None
+) -> None:
+    db.execute(
+        insert(Action).values(
+            **_action(
+                "ACT-ITEST-2",
+                KEY_2,
+                status=status,
+                authorization_decision=decision,
+                decided_at=None if decision is None else NOW,
+                **_timestamps_for(status),
+            )
+        )
+    )
+
+
 @pytest.mark.parametrize(
     ("overrides", "constraint"),
     [
-        ({"status": ActionStatus.AUTHORIZED}, "ck_actions_status_matches_authorization_decision"),
         (
             {
                 "status": ActionStatus.DENIED,
+                "authorization_decision": AuthorizationDecision.ALLOW,
+                "decided_at": NOW,
+            },
+            "ck_actions_status_matches_authorization_decision",
+        ),
+        (
+            {
+                "status": ActionStatus.AWAITING_APPROVAL,
+                "authorization_decision": AuthorizationDecision.ALLOW,
+                "decided_at": NOW,
+            },
+            "ck_actions_status_matches_authorization_decision",
+        ),
+        (
+            {
+                "status": ActionStatus.PROPOSED,
                 "authorization_decision": AuthorizationDecision.ALLOW,
                 "decided_at": NOW,
             },

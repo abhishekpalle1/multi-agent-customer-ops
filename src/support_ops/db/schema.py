@@ -347,12 +347,16 @@ class Action(_Timestamps, Base):
             name="refund_requires_positive_amount",
         ),
         CheckConstraint(f"idempotency_key ~ '{_SHA256_REGEX}'", name="idempotency_key_format"),
+        # Decision-bearing states require IS NOT NULL explicitly: without it, a NULL decision
+        # makes its branch UNKNOWN rather than FALSE, and PostgreSQL accepts UNKNOWN CHECKs.
         CheckConstraint(
             "(status = 'proposed' AND authorization_decision IS NULL) OR "
-            "(status = 'denied' AND authorization_decision = 'deny') OR "
-            "(status IN ('awaiting_approval', 'rejected') "
+            "(status = 'denied' AND authorization_decision IS NOT NULL "
+            "AND authorization_decision = 'deny') OR "
+            "(status IN ('awaiting_approval', 'rejected') AND authorization_decision IS NOT NULL "
             "AND authorization_decision = 'requires_approval') OR "
             "(status IN ('authorized', 'executing', 'succeeded', 'failed', 'unknown') "
+            "AND authorization_decision IS NOT NULL "
             "AND authorization_decision IN ('allow', 'requires_approval'))",
             name="status_matches_authorization_decision",
         ),
