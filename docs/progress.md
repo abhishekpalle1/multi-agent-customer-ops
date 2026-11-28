@@ -59,7 +59,7 @@ Branch `feature/p0-bootstrap`. Phase 0 stays pending until both of the following
   - **GitHub Actions CI: not yet verified.**
   - **Gemini live smoke tests: created, not executed.** Model IDs not yet recorded; embedding vector dimension not yet observed. (Final embedding model, output dimension, pgvector column/index settings, and chunking are Phase 4 decisions.)
 - Versions:
-  - **Direct dependencies (pinned in `pyproject.toml`):** fastapi 0.162.7, uvicorn 0.54.0, pydantic 2.14.3, pydantic-settings 2.16.3, sqlalchemy >=2.0.57,<2.1, psycopg[binary] 3.3.9, alembic 1.20.1, openai-agents 0.24.0, openai 3.51.0; dev group: pytest 9.2.0, pytest-asyncio 1.5.0, httpx 0.28.1, ruff 0.17.5, mypy 2.4.1.
+  - **Direct dependencies (pinned in `pyproject.toml`):** fastapi 0.162.7, uvicorn 0.54.0, pydantic 2.14.3, pydantic-settings 2.16.3, sqlalchemy 2.0.57, psycopg[binary] 3.3.9, alembic 1.20.1, openai-agents 0.24.0, openai 3.51.0; dev group: pytest 9.2.0, pytest-asyncio 1.5.0, httpx 0.28.1, ruff 0.17.5, mypy 2.4.1.
   - **Resolved dependency graph (`uv.lock`):** pending regeneration for the pins above. The committed lock (`3f91c35`, 68 packages from public PyPI) describes the superseded set (e.g. fastapi 0.165.0, openai-agents 0.26.0, openai 3.60.0, sqlalchemy 2.0.58, starlette 1.10.0). Once regenerated, `uv.lock` is the authoritative record of every exact resolved version; individual resolved versions are not duplicated here.
   - **Toolchain:** uv 0.13.9 (Windows and Codespaces); CPython 3.12.12 (Windows) and 3.12.3 (Codespaces); ruff 0.17.5 (dev pin). CI pins uv 0.13.9, `actions/checkout@v7`, `astral-sh/setup-uv@v10.4.0`, `pgvector/pgvector:pg17`.
   - **Database:** Supabase development PostgreSQL 17 with pgvector 0.8.2 (reported by `/health`).
