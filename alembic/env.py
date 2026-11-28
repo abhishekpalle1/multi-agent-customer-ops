@@ -12,6 +12,7 @@ from alembic import context
 from sqlalchemy import Connection, create_engine, pool
 
 from support_ops.config import get_settings
+from support_ops.db.schema import Base
 from support_ops.db.session import CONNECT_TIMEOUT_SECONDS
 
 config = context.config
@@ -19,8 +20,8 @@ config = context.config
 if config.config_file_name is not None and config.attributes.get("configure_logger", True):
     fileConfig(config.config_file_name, disable_existing_loggers=False)
 
-# Phase 0 defines no ORM tables; later phases set this to the schema metadata.
-target_metadata = None
+# Used by autogenerate and by the schema-drift integration test; migrations stay hand-written.
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
