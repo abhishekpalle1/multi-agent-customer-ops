@@ -4,8 +4,12 @@ Policy-grounded multi-agent orchestration for transaction-safe customer operatio
 The design is specified in [docs/architecture.md](docs/architecture.md); build status is
 tracked in [docs/progress.md](docs/progress.md).
 
-**Current phase: 0 (repository bootstrap).** It provides configuration, PostgreSQL +
+**Current phase: 1 (domain foundation).** Phase 0 provides configuration, PostgreSQL +
 pgvector connectivity, Alembic, `GET /health`, the Gemini provider smoke test, and CI.
+Phase 1 adds the deterministic domain layer (`src/support_ops/domain/`: enums, Pydantic
+contracts, refund calculator, executable policy engine, action state machine), the
+PostgreSQL schema (`src/support_ops/db/schema.py`), and migration `0002_create_domain_schema`.
+No Phase 1 behavior uses an LLM.
 
 ## Prerequisites
 
@@ -37,7 +41,12 @@ If script execution is blocked, run `powershell -ExecutionPolicy Bypass -File .\
 - Unit tests (`tests/unit`) use no network, database, or LLM.
 - Integration tests use only `TEST_DATABASE_URL`. They never fall back to `DATABASE_URL`
   and refuse to run if both identify the same logical database. Destructive test setup
-  additionally requires `APP_ENV=test` and `ALLOW_TEST_DATABASE_RESET=true`.
+  additionally requires `APP_ENV=test` and `ALLOW_TEST_DATABASE_RESET=true`; without both,
+  destructive tests (for example the `destructive_db` migration round trip) are skipped with
+  the reason shown. Each test session holds a shared advisory lock on the test database and
+  destructive tests take it exclusively, so they never overlap another test session.
+- Property-based tests use Hypothesis; the derandomized `ci` profile is selected
+  automatically when the `CI` environment variable is set.
 - Live tests need `GEMINI_API_KEY`, `AGENT_MODEL`, and `EMBEDDING_MODEL`; they are skipped
   when `GEMINI_API_KEY` is unset and are not run by PR CI.
 
