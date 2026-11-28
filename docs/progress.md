@@ -117,8 +117,16 @@ Branch `feature/p1-domain`. All Phase 1 "done when" criteria from architecture �
   - Return-label requirement, case transitions, approval thresholds, idempotency-key hashing, and FAILED-action retry policy are Phase 3+ decisions.
 - Versions: unchanged from Phase 0 except the new dev dependency `hypothesis==6.170.15` (transitive `sortedcontainers` 2.4.0), now recorded in the regenerated `uv.lock`.
 
-## Phase 2: Synthetic data, golden scenarios, policy prose — IMPLEMENTED (pending commit, CI, and development-database seed approval)
+## Phase 2: Synthetic data, golden scenarios, policy prose — COMPLETE
 Branch `feature/p2-synthetic-data`. No Phase 2 code uses an LLM: generation, golden labels, expected policy outcomes, and expected refund amounts are all deterministic, and the policy and refund ground truth comes from the Phase 1 engine and calculator.
+
+Phase 2 is complete:
+- **Dataset:** `p2-v1` (seed `20261101`, anchor `2026-11-01T12:00:00Z`) has 3,531 rows across 9 tables, including 625 orders. Fingerprint: `3cecef171648bfb9c2bc4536f96d658ce318ee67fc531e19179d0cd268b3290f`.
+- **Golden manifest:** 30 scenarios covering all 13 Phase 1 rule IDs and all 19 reason codes. The committed manifest matches a fresh deterministic generation.
+- **Policy prose:** six synthetic files, aligned with the executable Phase 1 rules.
+- **Dependencies:** none added; `pyproject.toml` and `uv.lock` unchanged.
+- **Tests:** the full non-live suite passed locally against the Supabase test database, and GitHub Actions CI passed on the final implementation.
+- **Development database:** seeded and reconciled. It was not reset, and `GET /health` returned HTTP 200.
 
 - Dataset identity:
   - `DATASET_VERSION=p2-v1`, `DEFAULT_RANDOM_SEED=20261101`, `SCENARIO_ANCHOR=2026-11-01T12:00:00Z`, in `src/support_ops/synthetic/dataset_config.py` and recorded in the manifest.
@@ -226,19 +234,36 @@ Branch `feature/p2-synthetic-data`. No Phase 2 code uses an LLM: generation, gol
   - **Destructive integration tests:**
     - They require schema `0002` and empty Phase-2-owned tables. Otherwise they skip with the reason shown and never delete an existing test dataset.
     - A `finally` block restores the baseline (owned tables truncated, schema at head) and asserts that the policy-table counts are unchanged.
-- Verification (local Windows, CPython 3.12.12, against the Supabase **test** database only):
-  - `ruff check .`: all checks passed. `ruff format`: clean. mypy (strict): no issues in 35 source files.
-  - Unit and Hypothesis tests: 419 passed (`tests/unit`).
-  - Full non-live suite with `APP_ENV=test ALLOW_TEST_DATABASE_RESET=true`: **535 passed, 4 `live_llm` deselected, 0 skipped**. This includes all 11 synthetic integration tests (8 destructive) and the Phase 1 migration round trip.
-  - CLI on the test target:
-    - `reset-seed-test` without the guard was refused (exit 1, no connection).
+- Final verification:
+  - **Static checks:** `ruff check .` passed, `ruff format` is clean, and mypy (strict) found no issues in 35 source files.
+  - **Unit and Hypothesis tests:** 419 passed (`tests/unit`).
+  - **Local Windows (CPython 3.12.12), full non-live suite against the Supabase test database** with `APP_ENV=test ALLOW_TEST_DATABASE_RESET=true`:
+    - **535 passed, 4 `live_llm` deselected, 0 skipped.**
+    - Includes all 11 synthetic integration tests (8 destructive) and the Phase 1 migration round trip.
+  - **Synthetic database integration tests passed:**
+    - A reset without the destructive guard was refused before connecting.
+    - A seed followed by a second seed was a verified no-op.
+    - A guarded reset + reseed produced the identical fingerprint.
+    - A failed seed and a failed reset + reseed both rolled back atomically.
+    - The append-only protections on the refund ledger remained intact.
+  - **Test-database CLI runs:**
+    - Without the guard, `reset-seed-test` was refused (exit 1, no connection).
     - `seed-test` inserted 3,531 rows and reconciliation passed.
-    - A second `seed-test` was `already_present`.
-    - Guarded `reset-seed-test` produced `reset_and_inserted` with the identical fingerprint.
-  - With the test database seeded and the destructive guard on, all 8 destructive tests skipped with the explanation, and the dataset still reconciled afterwards.
-  - Final test-database state: `0002_create_domain_schema`, all 21 Phase-2-owned tables empty, `policy_docs`/`policy_chunks` unchanged (0 rows).
-  - Dependencies: none added. `pyproject.toml` and `uv.lock` unchanged.
-- Not done / pending:
-  - **Development database not seeded or reset.** It awaits separate approval: `tasks.ps1 migrate` (expect no-op at `0002`), then `tasks.ps1 seed-dev` twice (insert, then `already_present`), then `GET /health`.
-  - GitHub Actions CI has not yet run on this branch. No workflow change is needed, because `make test` already runs the destructive tests against the ephemeral database.
-  - Eval world-state fixtures (Phase 6b), the golden case/action rows for duplicate and timeout (Phase 3), and policy ingestion (Phase 4).
+    - A second `seed-test` returned `already_present`.
+    - Guarded `reset-seed-test` returned `reset_and_inserted` with the identical fingerprint.
+  - **Refusal on existing data:** with the test database seeded and the destructive guard on, all 8 destructive tests skipped with the explanation, and the dataset still reconciled afterwards.
+  - **Test-database end state:** the destructive tests restored it to `0002_create_domain_schema` with all 21 Phase-2-owned tables empty. `policy_docs` and `policy_chunks` were untouched.
+  - **GitHub Actions CI:** passed on the final Phase 2 implementation, using its own ephemeral PostgreSQL 17 + pgvector database (no Supabase database, no secrets, `live_llm` excluded).
+  - **Development database:**
+    - Validation passed.
+    - `seed-dev` inserted exactly 3,531 rows and post-seed reconciliation passed.
+    - A second `seed-dev` returned `already_present` with the identical fingerprint.
+    - The development database was **not** reset.
+  - **Local FastAPI `GET /health`:** HTTP 200 (app = ok, database = ok, pgvector = ok, pgvector version 0.8.2).
+  - **Dependencies:** none added. `pyproject.toml` and `uv.lock` unchanged.
+- Known gaps / follow-ups (no open Phase 2 verification items):
+  - **Eval world-state fixtures** are deferred to the eval-harness phase (Phase 6b).
+  - **Duplicate-request and timeout-after-commit fixtures:** Phase 2 seeds only their underlying business facts (orders). The reserved case IDs `CASE-DUPLICATE-001` and `CASE-TIMEOUT-COMMIT-001` are not Phase 2 rows; Phase 3 creates their case and action fixtures.
+  - **Cross-customer fixture:** records owner and requester facts only. It has no Phase 3 authorization decision.
+  - **Phase 3 consistency:** Phase 3 must keep the replacement stock definition (available inventory ≥ requested quantity) consistent with the manifest.
+  - **Reset scope:** `reset-seed-*` preserves `policy_docs` and `policy_chunks`. Policy ingestion, chunking, and embeddings remain Phase 4.
