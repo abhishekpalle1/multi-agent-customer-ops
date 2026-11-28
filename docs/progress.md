@@ -116,3 +116,154 @@ Branch `feature/p1-domain`. All Phase 1 "done when" criteria from architecture �
   - `audit_log` is append-only by convention only (no trigger); revisit in Phase 3 if required.
   - Return-label requirement, case transitions, approval thresholds, idempotency-key hashing, and FAILED-action retry policy are Phase 3+ decisions.
 - Versions: unchanged from Phase 0 except the new dev dependency `hypothesis==6.170.15` (transitive `sortedcontainers` 2.4.0), now recorded in the regenerated `uv.lock`.
+
+## Phase 2: Synthetic data, golden scenarios, policy prose — COMPLETE
+Branch `feature/p2-synthetic-data`. No Phase 2 code uses an LLM: generation, golden labels, expected policy outcomes, and expected refund amounts are all deterministic, and the policy and refund ground truth comes from the Phase 1 engine and calculator.
+
+Phase 2 is complete:
+- **Dataset:** `p2-v1` (seed `20261101`, anchor `2026-11-01T12:00:00Z`) has 3,531 rows across 9 tables, including 625 orders. Fingerprint: `3cecef171648bfb9c2bc4536f96d658ce318ee67fc531e19179d0cd268b3290f`.
+- **Golden manifest:** 30 scenarios covering all 13 Phase 1 rule IDs and all 19 reason codes. The committed manifest matches a fresh deterministic generation.
+- **Policy prose:** six synthetic files, aligned with the executable Phase 1 rules.
+- **Dependencies:** none added; `pyproject.toml` and `uv.lock` unchanged.
+- **Tests:** the full non-live suite passed locally against the Supabase test database, and GitHub Actions CI passed on the final implementation.
+- **Development database:** seeded and reconciled. It was not reset, and `GET /health` returned HTTP 200.
+
+- Dataset identity:
+  - `DATASET_VERSION=p2-v1`, `DEFAULT_RANDOM_SEED=20261101`, `SCENARIO_ANCHOR=2026-11-01T12:00:00Z`, in `src/support_ops/synthetic/dataset_config.py` and recorded in the manifest.
+  - Required schema `0002_create_domain_schema`; ruleset `synthetic-p1-2026.11`.
+  - Every timestamp column, including `created_at`/`updated_at`, is set from the anchor. No wall clock and no UUIDs.
+  - Changing the anchor, the allocation tables, or the golden catalog is a dataset-version change.
+- Exact row counts (independent of the seed):
+
+  | Table | Rows |
+  |---|---:|
+  | customers | 182 |
+  | products | 69 |
+  | inventory | 69 |
+  | orders | 625 |
+  | order_items | 1,222 |
+  | shipments | 587 |
+  | payments | 625 |
+  | refunds | 65 |
+  | refund_items | 87 |
+  | **Total** | **3,531** |
+
+  - Background: 180 customers, 60 products (9 non-returnable, 6 out of stock), 600 orders (540 delivered, 24 shipped, 12 placed, 24 cancelled).
+  - Golden: 2 customers (`CUST-10`, `CUST-20`), 9 products, 25 orders.
+  - No case, action, approval, return, replacement, audit-log, outbox, or policy rows.
+  - Dataset fingerprint (SHA-256 of canonical rows, default seed): `3cecef171648bfb9c2bc4536f96d658ce318ee67fc531e19179d0cd268b3290f`.
+- Built:
+  - `src/support_ops/synthetic/`:
+    - `dataset_config`: identity constants and allocation tables.
+    - `records`: frozen row records, canonical serialization, per-table and combined fingerprints.
+    - `vocabulary`: fixed fictional word lists.
+    - `facts`: records to Phase 1 `OrderFacts`; replacement stock fact.
+    - `economics`: the single integer-cent pricing and refund-ledger module.
+    - `background`: generator driven by an owned `random.Random(seed)`.
+    - `golden`: explicit golden world and 30 scenarios with declared intent.
+    - `dataset`: assembly, collision checks, `PreparedDataset`.
+    - `validation`: in-memory invariants.
+    - `manifest`: Pydantic manifest models; built by calling the real `evaluate_policy`/`calculate_refund`; checked against declared intent.
+    - `reconcile`: independent SQL aggregates, per-table fingerprints, re-evaluation of golden scenarios from facts loaded from the database.
+    - `seeding`: named targets, guards, sanitized identity, advisory locks, single-transaction seed and reset.
+    - `cli` / `__main__`: `validate`, `manifest`, `seed`, `reset-seed`.
+  - `src/support_ops/db/locks.py`: advisory-lock keys, now shared by the test harness and the CLI.
+  - `config.py`: `ALLOW_DEV_DATABASE_RESET` (default false), `resolve_development_database_url`, `require_destructive_dev_reset`.
+  - `data/golden/scenarios.json`: the committed manifest, generated rather than hand-written, sorted keys and scenarios.
+  - `data/policies/`: six synthetic policy documents. `order_eligibility_v1`, `refunds_v1`, `returns_v1`, `damaged_items_v1`, `cancellations_v1`, and `replacements_v1` hold one section for each Phase 1 rule ID (ORD-1.1/1.2, RFD-2.1/2.2, RET-3.1/3.2, DMG-4.1/4.2, CAN-5.1/5.2/5.3, RPL-6.1/6.2) with titles identical to the executable catalog. They are not persisted, chunked, or embedded; that is Phase 4.
+  - Tasks in both `tasks.ps1` and the `Makefile`: `synthetic-validate`, `synthetic-manifest`, `seed-dev`, `reset-seed-dev`, `seed-test`, `reset-seed-test`.
+  - Tests: `tests/unit/synthetic/` (dataset, economics, golden manifest, policy prose, seed guards), new dev-reset guard tests in `tests/unit/test_config.py`, and `tests/integration/test_synthetic_seed.py`.
+- Golden scenario inventory (30). Each one's policy and refund expectations come from real Phase 1 calls at the anchor:
+  - **Window boundaries:**
+    - `damaged-day-008-refund`: eligible, 104.18.
+    - `damaged-day-030-refund`: delivered 23:30 UTC, eligible, 60.45.
+    - `damaged-day-031-refund`: delivered 00:15 UTC, ineligible (DMG-4.1).
+    - `change-of-mind-day-030-refund`: eligible, 38.87, no shipping.
+    - `change-of-mind-day-031-refund`: ineligible (RET-3.1).
+    - `change-of-mind-day-090-return`: ineligible.
+  - **Returnability:**
+    - `returnable-change-of-mind-return`: eligible.
+    - `nonreturnable-change-of-mind-return`: ineligible (RET-3.2).
+    - `nonreturnable-damaged-exception-refund`: eligible via the DMG-4.2 damaged-item exception, 37.22 including shipping.
+  - **Lifecycle:**
+    - `cancel-placed-order`: CAN-5.1 eligible.
+    - `cancel-shipped-order`: CAN-5.2.
+    - `cancel-delivered-order`: CAN-5.2.
+    - `cancel-cancelled-order`: CAN-5.3.
+    - `refund-shipped-not-delivered`: ORD-1.2.
+    - `refund-cancelled-order`: ORD-1.1.
+  - **Refund history:**
+    - `partial-quantity-prior-refund`: 31.46, prorated.
+    - `amount-only-adjustment-cap`: 56.40, capped by 30.00.
+    - `fully-refunded-item`: RFD-2.1.
+    - `multi-item-one-line-partial`: 80.45.
+  - **Replacement:**
+    - `replacement-in-stock`: eligible.
+    - `replacement-out-of-stock`: RPL-6.2.
+    - `replacement-requires-damage`: RPL-6.1.
+  - **Phase 3 fixtures (facts only, no authorization outcome):**
+    - `amount-boundary-049`, `-149`, `-150`, `-151`, `-799`: totals exactly 49.00, 149.00, 150.00, 151.00, and 799.00, with zero shipping so the item amount equals the total.
+    - `cross-customer-ownership`: owner `CUST-20`, requester `CUST-10`. Policy alone would allow it, so the denial must come from Phase 3 ownership checks. No access label is recorded.
+    - `duplicate-refund-request-base` and `timeout-after-commit-base`: reserved IDs `CASE-DUPLICATE-001` and `CASE-TIMEOUT-COMMIT-001`.
+  - All 13 rule IDs and all 19 `PolicyReasonCode` values are covered.
+- Decisions:
+  - **Code location and manifest format (deviates from architecture §9/§10.3/§22.1, approved):** code lives under `src/support_ops/synthetic/` so it is type-checked with mypy strict, instead of `seed/generate_seed.py`. The manifest is JSON at `data/golden/scenarios.json` instead of `seed/golden_scenarios.yaml`, which avoids adding PyYAML. `docs/architecture.md` is unchanged.
+  - **Eval world-state fixtures deferred to Phase 6b (approved deviation from §22.1):** their format belongs to the eval harness.
+  - **Golden case rows not seeded (approved):** the base orders for `CASE-DUPLICATE-001` and `CASE-TIMEOUT-COMMIT-001` are seeded, but the case rows are not. The manifest records only the reserved case IDs, so the architecture's "every golden ID exists" criterion holds for orders, not for these two case IDs. Phase 3 creates the case and action fixtures.
+  - **Scale:** lighter than the architecture §10 *suggested* demo scale, as approved.
+  - **Money:**
+    - Pricing is done in integer cents in `economics.py`.
+    - Every historical refund that returns units is recorded from a real `calculate_refund` result.
+      - Golden refund-history entries are first evaluated by the real policy engine at their historical instant, and `include_shipping` comes from that evaluation.
+      - Background historical refunds pass `include_shipping=False`.
+    - Amount-only goodwill adjustments (`quantity=0`) are the only refund-ledger rows the calculator does not produce. They are bounded by the Phase 1 `OrderLineFacts` invariants.
+  - **Cancelled orders:**
+    - A cancelled order's history is modelled as an **order-cancellation payment reversal**: the entire captured payment, shipping included, with `action_id` NULL.
+    - It is not a refund request and not an application of RFD-2.2. The refunds and cancellations prose says so.
+    - Reason: a `placed` order is already paid (enums docstring).
+  - **Replacement stock fact:** a product is in stock when its available inventory is at least the requested quantity. Phase 3 must use the same definition or update the manifest.
+  - **Golden and background namespaces:** background IDs are fixed-width numbers (`CUST-1xxx`, `ORD-1xxxxx`, `SKU-1xxxx`); golden IDs are words, plus `CUST-10`/`CUST-20`. Golden data uses no randomness, so a different seed changes background values only. This is verified for arbitrary seeds with Hypothesis.
+  - **Seed and reset safety:**
+    - Targets are named; no URL argument exists.
+    - Guards run before any engine is created.
+    - Logs show `target`, `database` name, and a 12-character SHA-256 identity hash only.
+    - Plain seed inserts only into empty Phase-2-owned tables, is a verified no-op if every table fingerprint matches, and otherwise refuses. It never runs UPDATE, DELETE, or upsert.
+    - Reset + seed is TRUNCATE (21 business and transactional tables, no CASCADE, `RESTART IDENTITY`), insert, and reconcile in **one transaction**, so a failure keeps the previous data. It preserves `policy_docs`/`policy_chunks`.
+    - Test-target CLI runs take the test-database advisory lock exclusively; development seeds use a separate key.
+  - **Ruff S311:** Ruff 0.17.5 flagged only the owned `random.Random(seed)` construction. It is suppressed inline on that one line with a justification (deterministic, non-security synthetic data). `pyproject.toml` is unchanged and S311 remains enabled everywhere else.
+  - **Destructive integration tests:**
+    - They require schema `0002` and empty Phase-2-owned tables. Otherwise they skip with the reason shown and never delete an existing test dataset.
+    - A `finally` block restores the baseline (owned tables truncated, schema at head) and asserts that the policy-table counts are unchanged.
+- Final verification:
+  - **Static checks:** `ruff check .` passed, `ruff format` is clean, and mypy (strict) found no issues in 35 source files.
+  - **Unit and Hypothesis tests:** 419 passed (`tests/unit`).
+  - **Local Windows (CPython 3.12.12), full non-live suite against the Supabase test database** with `APP_ENV=test ALLOW_TEST_DATABASE_RESET=true`:
+    - **535 passed, 4 `live_llm` deselected, 0 skipped.**
+    - Includes all 11 synthetic integration tests (8 destructive) and the Phase 1 migration round trip.
+  - **Synthetic database integration tests passed:**
+    - A reset without the destructive guard was refused before connecting.
+    - A seed followed by a second seed was a verified no-op.
+    - A guarded reset + reseed produced the identical fingerprint.
+    - A failed seed and a failed reset + reseed both rolled back atomically.
+    - The append-only protections on the refund ledger remained intact.
+  - **Test-database CLI runs:**
+    - Without the guard, `reset-seed-test` was refused (exit 1, no connection).
+    - `seed-test` inserted 3,531 rows and reconciliation passed.
+    - A second `seed-test` returned `already_present`.
+    - Guarded `reset-seed-test` returned `reset_and_inserted` with the identical fingerprint.
+  - **Refusal on existing data:** with the test database seeded and the destructive guard on, all 8 destructive tests skipped with the explanation, and the dataset still reconciled afterwards.
+  - **Test-database end state:** the destructive tests restored it to `0002_create_domain_schema` with all 21 Phase-2-owned tables empty. `policy_docs` and `policy_chunks` were untouched.
+  - **GitHub Actions CI:** passed on the final Phase 2 implementation, using its own ephemeral PostgreSQL 17 + pgvector database (no Supabase database, no secrets, `live_llm` excluded).
+  - **Development database:**
+    - Validation passed.
+    - `seed-dev` inserted exactly 3,531 rows and post-seed reconciliation passed.
+    - A second `seed-dev` returned `already_present` with the identical fingerprint.
+    - The development database was **not** reset.
+  - **Local FastAPI `GET /health`:** HTTP 200 (app = ok, database = ok, pgvector = ok, pgvector version 0.8.2).
+  - **Dependencies:** none added. `pyproject.toml` and `uv.lock` unchanged.
+- Known gaps / follow-ups (no open Phase 2 verification items):
+  - **Eval world-state fixtures** are deferred to the eval-harness phase (Phase 6b).
+  - **Duplicate-request and timeout-after-commit fixtures:** Phase 2 seeds only their underlying business facts (orders). The reserved case IDs `CASE-DUPLICATE-001` and `CASE-TIMEOUT-COMMIT-001` are not Phase 2 rows; Phase 3 creates their case and action fixtures.
+  - **Cross-customer fixture:** records owner and requester facts only. It has no Phase 3 authorization decision.
+  - **Phase 3 consistency:** Phase 3 must keep the replacement stock definition (available inventory ≥ requested quantity) consistent with the manifest.
+  - **Reset scope:** `reset-seed-*` preserves `policy_docs` and `policy_chunks`. Policy ingestion, chunking, and embeddings remain Phase 4.

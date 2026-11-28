@@ -27,6 +27,10 @@ class UnsafeTestDatabaseError(DatabaseConfigError):
     """The test database configuration could target a non-test database."""
 
 
+class UnsafeDevelopmentDatabaseError(DatabaseConfigError):
+    """A development-database operation is not explicitly allowed or could hit the test DB."""
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -39,6 +43,7 @@ class Settings(BaseSettings):
     database_url: SecretStr | None = None
     test_database_url: SecretStr | None = None
     allow_test_database_reset: bool = False
+    allow_dev_database_reset: bool = False
 
     agent_model: str | None = None
     judge_model: str | None = None
@@ -132,3 +137,36 @@ def require_destructive_test_reset(settings: Settings) -> URL:
             "Destructive test-database setup requires ALLOW_TEST_DATABASE_RESET=true."
         )
     return test_url
+
+
+def resolve_development_database_url(settings: Settings) -> URL:
+    """Return the development database URL for non-destructive writes such as seeding.
+
+    Requires ``APP_ENV=development`` and refuses when ``TEST_DATABASE_URL`` identifies the
+    same logical database, so a development write can never land in the test database.
+    """
+    if settings.app_env != "development":
+        raise UnsafeDevelopmentDatabaseError(
+            "Development-database writes require APP_ENV=development."
+        )
+    dev_url = settings.sqlalchemy_database_url()
+    if settings.test_database_url is not None and settings.test_database_url.get_secret_value():
+        test_url = to_sqlalchemy_url(
+            settings.test_database_url.get_secret_value(), env_var="TEST_DATABASE_URL"
+        )
+        if database_identity(test_url) == database_identity(dev_url):
+            raise UnsafeDevelopmentDatabaseError(
+                "DATABASE_URL and TEST_DATABASE_URL identify the same logical database; "
+                "refusing to write development data to it."
+            )
+    return dev_url
+
+
+def require_destructive_dev_reset(settings: Settings) -> URL:
+    """Return the development database URL only if a destructive reset is explicitly allowed."""
+    dev_url = resolve_development_database_url(settings)
+    if not settings.allow_dev_database_reset:
+        raise UnsafeDevelopmentDatabaseError(
+            "Destructive development-database reset requires ALLOW_DEV_DATABASE_RESET=true."
+        )
+    return dev_url

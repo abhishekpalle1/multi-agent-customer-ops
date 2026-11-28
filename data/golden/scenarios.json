@@ -1,0 +1,2503 @@
+{
+  "anchor_time": "2026-11-01T12:00:00Z",
+  "dataset_fingerprint": "3cecef171648bfb9c2bc4536f96d658ce318ee67fc531e19179d0cd268b3290f",
+  "dataset_version": "p2-v1",
+  "random_seed": 20261101,
+  "required_schema_revision": "0002_create_domain_schema",
+  "rounding_policy": "half_up_to_cent",
+  "row_counts": {
+    "customers": 182,
+    "inventory": 69,
+    "order_items": 1222,
+    "orders": 625,
+    "payments": 625,
+    "products": 69,
+    "refund_items": 87,
+    "refunds": 65,
+    "shipments": 587
+  },
+  "ruleset_version": "synthetic-p1-2026.11",
+  "scenarios": [
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "monetary-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My order ORD-AMOUNT-049 arrived damaged. Please refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 7,
+      "delivered_at": "2026-10-25T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 7,
+        "decision": "eligible",
+        "delivered_on": "2026-10-25",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-AMOUNT-049-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-AMOUNT-049",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-24"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "49.00",
+        "gross_amount_total": "45.00",
+        "items_refund_total": "49.00",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "49.00",
+            "gross_amount": "45.00",
+            "line_paid_total": "49.00",
+            "order_item_id": "ITEM-AMOUNT-049-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "49.00",
+            "refundable_tax": "4.00",
+            "remaining_paid_amount": "49.00",
+            "unit_price": "45.00"
+          }
+        ],
+        "order_id": "ORD-AMOUNT-049",
+        "refundable_tax_total": "4.00",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "49.00"
+      },
+      "monetary_boundary": "49.00",
+      "notes": "Eligible damaged refund whose deterministic total is exactly $49.00; shipping is 0.00 so the item refund and the total coincide. Phase 3 attaches the authorization expectation; Phase 2 records the amount and facts only.",
+      "order_id": "ORD-AMOUNT-049",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "amount_boundary",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": null
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 35,
+            "order_item_id": "ITEM-AMOUNT-049-1",
+            "product_id": "SKU-GOLDEN-KETTLE",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "amount-boundary-049"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "monetary-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My order ORD-AMOUNT-149 arrived damaged. Please refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 7,
+      "delivered_at": "2026-10-25T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 7,
+        "decision": "eligible",
+        "delivered_on": "2026-10-25",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-AMOUNT-149-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-AMOUNT-149",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-24"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "149.00",
+        "gross_amount_total": "139.00",
+        "items_refund_total": "149.00",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "149.00",
+            "gross_amount": "139.00",
+            "line_paid_total": "149.00",
+            "order_item_id": "ITEM-AMOUNT-149-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "149.00",
+            "refundable_tax": "10.00",
+            "remaining_paid_amount": "149.00",
+            "unit_price": "139.00"
+          }
+        ],
+        "order_id": "ORD-AMOUNT-149",
+        "refundable_tax_total": "10.00",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "149.00"
+      },
+      "monetary_boundary": "149.00",
+      "notes": "Eligible damaged refund whose deterministic total is exactly $149.00; shipping is 0.00 so the item refund and the total coincide. Phase 3 attaches the authorization expectation; Phase 2 records the amount and facts only.",
+      "order_id": "ORD-AMOUNT-149",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "amount_boundary",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": null
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 40,
+            "order_item_id": "ITEM-AMOUNT-149-1",
+            "product_id": "SKU-GOLDEN-COFFEE-MAKER",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "amount-boundary-149"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "monetary-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My order ORD-AMOUNT-150 arrived damaged. Please refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 7,
+      "delivered_at": "2026-10-25T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 7,
+        "decision": "eligible",
+        "delivered_on": "2026-10-25",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-AMOUNT-150-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-AMOUNT-150",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-24"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "15.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "150.00",
+        "gross_amount_total": "155.00",
+        "items_refund_total": "150.00",
+        "lines": [
+          {
+            "allocated_discount": "15.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "150.00",
+            "gross_amount": "155.00",
+            "line_paid_total": "150.00",
+            "order_item_id": "ITEM-AMOUNT-150-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "150.00",
+            "refundable_tax": "10.00",
+            "remaining_paid_amount": "150.00",
+            "unit_price": "155.00"
+          }
+        ],
+        "order_id": "ORD-AMOUNT-150",
+        "refundable_tax_total": "10.00",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "150.00"
+      },
+      "monetary_boundary": "150.00",
+      "notes": "Eligible damaged refund whose deterministic total is exactly $150.00; shipping is 0.00 so the item refund and the total coincide. Phase 3 attaches the authorization expectation; Phase 2 records the amount and facts only.",
+      "order_id": "ORD-AMOUNT-150",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "amount_boundary",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": null
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 40,
+            "order_item_id": "ITEM-AMOUNT-150-1",
+            "product_id": "SKU-GOLDEN-COFFEE-MAKER",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "amount-boundary-150"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "monetary-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My order ORD-AMOUNT-151 arrived damaged. Please refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 7,
+      "delivered_at": "2026-10-25T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 7,
+        "decision": "eligible",
+        "delivered_on": "2026-10-25",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-AMOUNT-151-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-AMOUNT-151",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-24"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "151.00",
+        "gross_amount_total": "141.00",
+        "items_refund_total": "151.00",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "151.00",
+            "gross_amount": "141.00",
+            "line_paid_total": "151.00",
+            "order_item_id": "ITEM-AMOUNT-151-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "151.00",
+            "refundable_tax": "10.00",
+            "remaining_paid_amount": "151.00",
+            "unit_price": "141.00"
+          }
+        ],
+        "order_id": "ORD-AMOUNT-151",
+        "refundable_tax_total": "10.00",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "151.00"
+      },
+      "monetary_boundary": "151.00",
+      "notes": "Eligible damaged refund whose deterministic total is exactly $151.00; shipping is 0.00 so the item refund and the total coincide. Phase 3 attaches the authorization expectation; Phase 2 records the amount and facts only.",
+      "order_id": "ORD-AMOUNT-151",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "amount_boundary",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": null
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 40,
+            "order_item_id": "ITEM-AMOUNT-151-1",
+            "product_id": "SKU-GOLDEN-COFFEE-MAKER",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "amount-boundary-151"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "monetary-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My order ORD-AMOUNT-799 arrived damaged. Please refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 7,
+      "delivered_at": "2026-10-25T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 7,
+        "decision": "eligible",
+        "delivered_on": "2026-10-25",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-AMOUNT-799-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-AMOUNT-799",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-24"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "799.00",
+        "gross_amount_total": "740.00",
+        "items_refund_total": "799.00",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "799.00",
+            "gross_amount": "740.00",
+            "line_paid_total": "799.00",
+            "order_item_id": "ITEM-AMOUNT-799-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "799.00",
+            "refundable_tax": "59.00",
+            "remaining_paid_amount": "799.00",
+            "unit_price": "740.00"
+          }
+        ],
+        "order_id": "ORD-AMOUNT-799",
+        "refundable_tax_total": "59.00",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "799.00"
+      },
+      "monetary_boundary": "799.00",
+      "notes": "Eligible damaged refund whose deterministic total is exactly $799.00; shipping is 0.00 so the item refund and the total coincide. Phase 3 attaches the authorization expectation; Phase 2 records the amount and facts only.",
+      "order_id": "ORD-AMOUNT-799",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "amount_boundary",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": null
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 8,
+            "order_item_id": "ITEM-AMOUNT-799-1",
+            "product_id": "SKU-GOLDEN-MONITOR",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "amount-boundary-799"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "refund-history-amount-only"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "I've decided to send back the backpack from ORD-ADJUSTED-001 for a refund.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 5,
+      "delivered_at": "2026-10-27T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 5,
+        "decision": "eligible",
+        "delivered_on": "2026-10-27",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-ADJUSTED-001-1",
+            "reason_codes": [
+              "within_return_window"
+            ],
+            "triggered_rule_ids": [
+              "RET-3.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-ADJUSTED-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "within_return_window",
+          "shipping_not_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RET-3.1",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-26"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": true,
+        "currency": "USD",
+        "eligible_items_total": "86.40",
+        "gross_amount_total": "80.00",
+        "items_refund_total": "56.40",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "30.00",
+            "capped_by_prior_amount_refund": true,
+            "eligible_amount": "86.40",
+            "gross_amount": "80.00",
+            "line_paid_total": "86.40",
+            "order_item_id": "ITEM-ADJUSTED-001-1",
+            "prior_refunded_amount": "30.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "56.40",
+            "refundable_tax": "6.40",
+            "remaining_paid_amount": "56.40",
+            "unit_price": "80.00"
+          }
+        ],
+        "order_id": "ORD-ADJUSTED-001",
+        "refundable_tax_total": "6.40",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "56.40"
+      },
+      "monetary_boundary": null,
+      "notes": "A prior 30.00 amount-only goodwill adjustment caps the refund at the line's remaining paid amount.",
+      "order_id": "ORD-ADJUSTED-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 30,
+            "order_item_id": "ITEM-ADJUSTED-001-1",
+            "product_id": "SKU-GOLDEN-BACKPACK",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "amount-only-adjustment-cap"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "order-lifecycle"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Please cancel ORD-CANCELLED-001.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": null,
+      "delivered_at": null,
+      "expected_policy": {
+        "action_type": "cancellation",
+        "days_since_delivery": null,
+        "decision": "ineligible",
+        "delivered_on": null,
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [],
+        "order_id": "ORD-CANCELLED-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "order_already_cancelled"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "CAN-5.3"
+        ],
+        "window_days": null,
+        "window_ends_on": null
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Already cancelled; its payment was fully reversed at cancellation (CAN-5.3).",
+      "order_id": "ORD-CANCELLED-001",
+      "order_status": "cancelled",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "cancellation",
+        "items": [],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "cancel-cancelled-order"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "order-lifecycle"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Can you cancel ORD-RETURNABLE-001?",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 12,
+      "delivered_at": "2026-10-20T16:00:00Z",
+      "expected_policy": {
+        "action_type": "cancellation",
+        "days_since_delivery": null,
+        "decision": "ineligible",
+        "delivered_on": null,
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [],
+        "order_id": "ORD-RETURNABLE-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "order_already_delivered"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "CAN-5.2"
+        ],
+        "window_days": null,
+        "window_ends_on": null
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Delivered order: cancellation is no longer allowed (CAN-5.2).",
+      "order_id": "ORD-RETURNABLE-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "cancellation",
+        "items": [],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "cancel-delivered-order"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "order-lifecycle"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Please cancel ORD-PLACED-001, I ordered it by mistake.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": null,
+      "delivered_at": null,
+      "expected_policy": {
+        "action_type": "cancellation",
+        "days_since_delivery": null,
+        "decision": "eligible",
+        "delivered_on": null,
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [],
+        "order_id": "ORD-PLACED-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "cancellation_before_shipment"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "CAN-5.1"
+        ],
+        "window_days": null,
+        "window_ends_on": null
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Order still placed (not yet shipped): cancellation is allowed under CAN-5.1.",
+      "order_id": "ORD-PLACED-001",
+      "order_status": "placed",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "cancellation",
+        "items": [],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "cancel-placed-order"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "order-lifecycle"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Cancel ORD-SHIPPED-001, I don't want it anymore.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": null,
+      "delivered_at": null,
+      "expected_policy": {
+        "action_type": "cancellation",
+        "days_since_delivery": null,
+        "decision": "ineligible",
+        "delivered_on": null,
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [],
+        "order_id": "ORD-SHIPPED-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "order_already_shipped"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "CAN-5.2"
+        ],
+        "window_days": null,
+        "window_ends_on": null
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Shipped and in transit: cancellation is no longer allowed (CAN-5.2).",
+      "order_id": "ORD-SHIPPED-001",
+      "order_status": "shipped",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "cancellation",
+        "items": [],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "cancel-shipped-order"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "window-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "I changed my mind about the throw blanket from ORD-CHANGE-MIND-030. Can I get a refund?",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 30,
+      "delivered_at": "2026-10-02T23:30:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 30,
+        "decision": "eligible",
+        "delivered_on": "2026-10-02",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-CHANGE-MIND-030-1",
+            "reason_codes": [
+              "within_return_window"
+            ],
+            "triggered_rule_ids": [
+              "RET-3.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-CHANGE-MIND-030",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "within_return_window",
+          "shipping_not_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RET-3.1",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-01"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "4.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "38.87",
+        "gross_amount_total": "39.99",
+        "items_refund_total": "38.87",
+        "lines": [
+          {
+            "allocated_discount": "4.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "38.87",
+            "gross_amount": "39.99",
+            "line_paid_total": "38.87",
+            "order_item_id": "ITEM-CHANGE-MIND-030-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "38.87",
+            "refundable_tax": "2.88",
+            "remaining_paid_amount": "38.87",
+            "unit_price": "39.99"
+          }
+        ],
+        "order_id": "ORD-CHANGE-MIND-030",
+        "refundable_tax_total": "2.88",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "38.87"
+      },
+      "monetary_boundary": null,
+      "notes": "Change of mind on calendar day 30: eligible under RET-3.1; shipping is not refundable.",
+      "order_id": "ORD-CHANGE-MIND-030",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 50,
+            "order_item_id": "ITEM-CHANGE-MIND-030-1",
+            "product_id": "SKU-GOLDEN-THROW-BLANKET",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "change-of-mind-day-030-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "window-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "I no longer need the backpack from ORD-EXPIRED-031. Please refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 31,
+      "delivered_at": "2026-10-01T00:15:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 31,
+        "decision": "ineligible",
+        "delivered_on": "2026-10-01",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-EXPIRED-031-1",
+            "reason_codes": [
+              "return_window_expired"
+            ],
+            "triggered_rule_ids": [
+              "RET-3.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-EXPIRED-031",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "return_window_expired",
+          "shipping_not_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RET-3.1",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-10-31"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Change of mind on calendar day 31: outside the RET-3.1 return window.",
+      "order_id": "ORD-EXPIRED-031",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 30,
+            "order_item_id": "ITEM-EXPIRED-031-1",
+            "product_id": "SKU-GOLDEN-BACKPACK",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "change-of-mind-day-031-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "window-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "I'd like to return the headphones from ORD-EXPIRED-090; I don't use them.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 90,
+      "delivered_at": "2026-08-03T16:00:00Z",
+      "expected_policy": {
+        "action_type": "return",
+        "days_since_delivery": 90,
+        "decision": "ineligible",
+        "delivered_on": "2026-08-03",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-EXPIRED-090-1",
+            "reason_codes": [
+              "return_window_expired"
+            ],
+            "triggered_rule_ids": [
+              "RET-3.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-EXPIRED-090",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "return_window_expired"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RET-3.1"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-09-02"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Change-of-mind return roughly three months after delivery.",
+      "order_id": "ORD-EXPIRED-090",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "return",
+        "items": [
+          {
+            "available_inventory": 25,
+            "order_item_id": "ITEM-EXPIRED-090-1",
+            "product_id": "SKU-GOLDEN-HEADPHONES",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "change-of-mind-day-090-return"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "security-ownership"
+      ],
+      "customer_id": "CUST-20",
+      "customer_request": "Refund ORD-OTHER-CUSTOMER. It is mine and it arrived broken.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 5,
+      "delivered_at": "2026-10-27T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 5,
+        "decision": "eligible",
+        "delivered_on": "2026-10-27",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-OTHER-CUSTOMER-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-OTHER-CUSTOMER",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-26"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "140.39",
+        "gross_amount_total": "129.99",
+        "items_refund_total": "140.39",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "140.39",
+            "gross_amount": "129.99",
+            "line_paid_total": "140.39",
+            "order_item_id": "ITEM-OTHER-CUSTOMER-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "140.39",
+            "refundable_tax": "10.40",
+            "remaining_paid_amount": "140.39",
+            "unit_price": "129.99"
+          }
+        ],
+        "order_id": "ORD-OTHER-CUSTOMER",
+        "refundable_tax_total": "10.40",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "140.39"
+      },
+      "monetary_boundary": null,
+      "notes": "Order owned by CUST-20 and requested by CUST-10. The policy result is computed for the owner's facts only: policy alone would allow it, so the denial must come from the Phase 3 ownership check.",
+      "order_id": "ORD-OTHER-CUSTOMER",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "ownership",
+        "owner_customer_id": "CUST-20",
+        "requesting_customer_id": "CUST-10",
+        "reserved_case_id": null
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 25,
+            "order_item_id": "ITEM-OTHER-CUSTOMER-1",
+            "product_id": "SKU-GOLDEN-HEADPHONES",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "cross-customer-ownership"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "window-boundary",
+        "refund-history-none"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My coffee maker from ORD-DAMAGED-008 arrived cracked. I want a refund.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 8,
+      "delivered_at": "2026-10-24T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 8,
+        "decision": "eligible",
+        "delivered_on": "2026-10-24",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-DAMAGED-008-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-DAMAGED-008",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-23"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "97.19",
+        "gross_amount_total": "89.99",
+        "items_refund_total": "97.19",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "97.19",
+            "gross_amount": "89.99",
+            "line_paid_total": "97.19",
+            "order_item_id": "ITEM-DAMAGED-008-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "97.19",
+            "refundable_tax": "7.20",
+            "remaining_paid_amount": "97.19",
+            "unit_price": "89.99"
+          }
+        ],
+        "order_id": "ORD-DAMAGED-008",
+        "refundable_tax_total": "7.20",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "6.99",
+        "total_refund_amount": "104.18"
+      },
+      "monetary_boundary": null,
+      "notes": "Damaged item reported 8 days after delivery, well inside DMG-4.1; no prior refunds.",
+      "order_id": "ORD-DAMAGED-008",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 40,
+            "order_item_id": "ITEM-DAMAGED-008-1",
+            "product_id": "SKU-GOLDEN-COFFEE-MAKER",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "damaged-day-008-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "window-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "The kettle from ORD-DAMAGED-030 stopped heating and the base is cracked. Refund please.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 30,
+      "delivered_at": "2026-10-02T23:30:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 30,
+        "decision": "eligible",
+        "delivered_on": "2026-10-02",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-DAMAGED-030-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-DAMAGED-030",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-01"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "53.46",
+        "gross_amount_total": "49.50",
+        "items_refund_total": "53.46",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "53.46",
+            "gross_amount": "49.50",
+            "line_paid_total": "53.46",
+            "order_item_id": "ITEM-DAMAGED-030-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "53.46",
+            "refundable_tax": "3.96",
+            "remaining_paid_amount": "53.46",
+            "unit_price": "49.50"
+          }
+        ],
+        "order_id": "ORD-DAMAGED-030",
+        "refundable_tax_total": "3.96",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "6.99",
+        "total_refund_amount": "60.45"
+      },
+      "monetary_boundary": null,
+      "notes": "Delivered at 23:30 UTC on calendar day 30 (under 30 elapsed days): the last eligible day of the 30-day damage window.",
+      "order_id": "ORD-DAMAGED-030",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 35,
+            "order_item_id": "ITEM-DAMAGED-030-1",
+            "product_id": "SKU-GOLDEN-KETTLE",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "damaged-day-030-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "window-boundary"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "The backpack from ORD-EXPIRED-031 has a torn strap. I want my money back.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 31,
+      "delivered_at": "2026-10-01T00:15:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 31,
+        "decision": "ineligible",
+        "delivered_on": "2026-10-01",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-EXPIRED-031-1",
+            "reason_codes": [
+              "damage_report_window_expired"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-EXPIRED-031",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "damage_report_window_expired",
+          "shipping_not_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-10-31"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Delivered at 00:15 UTC on calendar day 31: the first day outside the damage window.",
+      "order_id": "ORD-EXPIRED-031",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 30,
+            "order_item_id": "ITEM-EXPIRED-031-1",
+            "product_id": "SKU-GOLDEN-BACKPACK",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "damaged-day-031-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "phase3-base"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My coffee maker from ORD-DUPLICATE-001 arrived cracked. I want a refund.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 6,
+      "delivered_at": "2026-10-26T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 6,
+        "decision": "eligible",
+        "delivered_on": "2026-10-26",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-DUPLICATE-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-DUPLICATE-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-25"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "97.19",
+        "gross_amount_total": "89.99",
+        "items_refund_total": "97.19",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "97.19",
+            "gross_amount": "89.99",
+            "line_paid_total": "97.19",
+            "order_item_id": "ITEM-DUPLICATE-001-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "97.19",
+            "refundable_tax": "7.20",
+            "remaining_paid_amount": "97.19",
+            "unit_price": "89.99"
+          }
+        ],
+        "order_id": "ORD-DUPLICATE-001",
+        "refundable_tax_total": "7.20",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "6.99",
+        "total_refund_amount": "104.18"
+      },
+      "monetary_boundary": null,
+      "notes": "Base facts for the Phase 3 duplicate-request scenario. The case and prior action are Phase 3 fixtures; no case or action rows are seeded in Phase 2.",
+      "order_id": "ORD-DUPLICATE-001",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "duplicate_request",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": "CASE-DUPLICATE-001"
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 40,
+            "order_item_id": "ITEM-DUPLICATE-001-1",
+            "product_id": "SKU-GOLDEN-COFFEE-MAKER",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "duplicate-refund-request-base"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "refund-history-full"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "The desk lamp from ORD-REFUNDED-001 is broken, refund it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 15,
+      "delivered_at": "2026-10-17T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 15,
+        "decision": "ineligible",
+        "delivered_on": "2026-10-17",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-REFUNDED-001-1",
+            "reason_codes": [
+              "item_already_refunded"
+            ],
+            "triggered_rule_ids": [
+              "RFD-2.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-REFUNDED-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "item_already_refunded",
+          "shipping_not_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RFD-2.1",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-16"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "The only line was already fully refunded (with shipping) for damage (RFD-2.1).",
+      "order_id": "ORD-REFUNDED-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 0,
+            "order_item_id": "ITEM-REFUNDED-001-1",
+            "product_id": "SKU-GOLDEN-DESK-LAMP",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "fully-refunded-item"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "refund-history-multi-line"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "The kettle and the remaining water bottle from ORD-MULTI-PARTIAL-001 arrived damaged.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 7,
+      "delivered_at": "2026-10-25T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 7,
+        "decision": "eligible",
+        "delivered_on": "2026-10-25",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-MULTI-PARTIAL-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          },
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-MULTI-PARTIAL-001-2",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-MULTI-PARTIAL-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-24"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "80.45",
+        "gross_amount_total": "74.49",
+        "items_refund_total": "80.45",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "53.46",
+            "gross_amount": "49.50",
+            "line_paid_total": "53.46",
+            "order_item_id": "ITEM-MULTI-PARTIAL-001-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "53.46",
+            "refundable_tax": "3.96",
+            "remaining_paid_amount": "53.46",
+            "unit_price": "49.50"
+          },
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "26.99",
+            "gross_amount": "24.99",
+            "line_paid_total": "53.98",
+            "order_item_id": "ITEM-MULTI-PARTIAL-001-2",
+            "prior_refunded_amount": "26.99",
+            "quantity_previously_refunded": 1,
+            "quantity_purchased": 2,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "26.99",
+            "refundable_tax": "2.00",
+            "remaining_paid_amount": "26.99",
+            "unit_price": "24.99"
+          }
+        ],
+        "order_id": "ORD-MULTI-PARTIAL-001",
+        "refundable_tax_total": "5.96",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "0.00",
+        "total_refund_amount": "80.45"
+      },
+      "monetary_boundary": null,
+      "notes": "Three-line order where only line 2 had one unit refunded before; refund line 1 and line 2's remaining unit.",
+      "order_id": "ORD-MULTI-PARTIAL-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 35,
+            "order_item_id": "ITEM-MULTI-PARTIAL-001-1",
+            "product_id": "SKU-GOLDEN-KETTLE",
+            "quantity": 1,
+            "returnable": true
+          },
+          {
+            "available_inventory": 200,
+            "order_item_id": "ITEM-MULTI-PARTIAL-001-2",
+            "product_id": "SKU-GOLDEN-WATER-BOTTLE",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "multi-item-one-line-partial"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "returnability"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "I want to return the vase from ORD-NONRETURNABLE-001; it doesn't match my room.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 10,
+      "delivered_at": "2026-10-22T16:00:00Z",
+      "expected_policy": {
+        "action_type": "return",
+        "days_since_delivery": 10,
+        "decision": "ineligible",
+        "delivered_on": "2026-10-22",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-NONRETURNABLE-001-1",
+            "reason_codes": [
+              "within_return_window",
+              "item_non_returnable"
+            ],
+            "triggered_rule_ids": [
+              "RET-3.1",
+              "RET-3.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-NONRETURNABLE-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "within_return_window",
+          "item_non_returnable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RET-3.1",
+          "RET-3.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-21"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Non-returnable clearance product: inside the window but final sale (RET-3.2).",
+      "order_id": "ORD-NONRETURNABLE-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "return",
+        "items": [
+          {
+            "available_inventory": 12,
+            "order_item_id": "ITEM-NONRETURNABLE-001-1",
+            "product_id": "SKU-GOLDEN-CLEARANCE-VASE",
+            "quantity": 1,
+            "returnable": false
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "nonreturnable-change-of-mind-return"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "returnability"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "The clearance vase from ORD-CLEARANCE-DAMAGED-001 arrived shattered. Refund please.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 6,
+      "delivered_at": "2026-10-26T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 6,
+        "decision": "eligible",
+        "delivered_on": "2026-10-26",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-CLEARANCE-DAMAGED-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_exception"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-CLEARANCE-DAMAGED-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_exception",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-25"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "7.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "30.23",
+        "gross_amount_total": "34.99",
+        "items_refund_total": "30.23",
+        "lines": [
+          {
+            "allocated_discount": "7.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "30.23",
+            "gross_amount": "34.99",
+            "line_paid_total": "30.23",
+            "order_item_id": "ITEM-CLEARANCE-DAMAGED-001-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "30.23",
+            "refundable_tax": "2.24",
+            "remaining_paid_amount": "30.23",
+            "unit_price": "34.99"
+          }
+        ],
+        "order_id": "ORD-CLEARANCE-DAMAGED-001",
+        "refundable_tax_total": "2.24",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "6.99",
+        "total_refund_amount": "37.22"
+      },
+      "monetary_boundary": null,
+      "notes": "Same non-returnable product as ORD-NONRETURNABLE-001, but damaged: the DMG-4.2 exception makes it eligible and RFD-2.2 makes shipping refundable.",
+      "order_id": "ORD-CLEARANCE-DAMAGED-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 12,
+            "order_item_id": "ITEM-CLEARANCE-DAMAGED-001-1",
+            "product_id": "SKU-GOLDEN-CLEARANCE-VASE",
+            "quantity": 1,
+            "returnable": false
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "nonreturnable-damaged-exception-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "refund-history-partial-quantity"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Another water bottle from ORD-PARTIAL-REFUND-001 arrived dented. Refund that one too.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 9,
+      "delivered_at": "2026-10-23T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 9,
+        "decision": "eligible",
+        "delivered_on": "2026-10-23",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-PARTIAL-REFUND-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-PARTIAL-REFUND-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-22"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "2.34",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "24.47",
+        "gross_amount_total": "24.99",
+        "items_refund_total": "24.47",
+        "lines": [
+          {
+            "allocated_discount": "2.34",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "24.47",
+            "gross_amount": "24.99",
+            "line_paid_total": "73.41",
+            "order_item_id": "ITEM-PARTIAL-REFUND-001-1",
+            "prior_refunded_amount": "24.47",
+            "quantity_previously_refunded": 1,
+            "quantity_purchased": 3,
+            "quantity_remaining": 2,
+            "quantity_selected": 1,
+            "refund_amount": "24.47",
+            "refundable_tax": "1.82",
+            "remaining_paid_amount": "48.94",
+            "unit_price": "24.99"
+          }
+        ],
+        "order_id": "ORD-PARTIAL-REFUND-001",
+        "refundable_tax_total": "1.82",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "6.99",
+        "total_refund_amount": "31.46"
+      },
+      "monetary_boundary": null,
+      "notes": "One of three units was already refunded; the second unit's discount and tax are prorated cumulatively by the Phase 1 calculator.",
+      "order_id": "ORD-PARTIAL-REFUND-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 200,
+            "order_item_id": "ITEM-PARTIAL-REFUND-001-1",
+            "product_id": "SKU-GOLDEN-WATER-BOTTLE",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "partial-quantity-prior-refund"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "order-lifecycle"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "I want a refund for ORD-CANCELLED-001.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": null,
+      "delivered_at": null,
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": null,
+        "decision": "ineligible",
+        "delivered_on": null,
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-CANCELLED-001-1",
+            "reason_codes": [
+              "order_cancelled"
+            ],
+            "triggered_rule_ids": [
+              "ORD-1.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-CANCELLED-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "order_cancelled"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "ORD-1.1"
+        ],
+        "window_days": null,
+        "window_ends_on": null
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Cancelled order: not eligible for item actions (ORD-1.1).",
+      "order_id": "ORD-CANCELLED-001",
+      "order_status": "cancelled",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 35,
+            "order_item_id": "ITEM-CANCELLED-001-1",
+            "product_id": "SKU-GOLDEN-KETTLE",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "refund-cancelled-order"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "order-lifecycle"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My headphones from ORD-SHIPPED-001 are damaged, refund them.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": null,
+      "delivered_at": null,
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": null,
+        "decision": "ineligible",
+        "delivered_on": null,
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-SHIPPED-001-1",
+            "reason_codes": [
+              "order_not_delivered"
+            ],
+            "triggered_rule_ids": [
+              "ORD-1.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-SHIPPED-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "order_not_delivered"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "ORD-1.2"
+        ],
+        "window_days": null,
+        "window_ends_on": null
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Item not yet delivered: refunds require delivery (ORD-1.2).",
+      "order_id": "ORD-SHIPPED-001",
+      "order_status": "shipped",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 25,
+            "order_item_id": "ITEM-SHIPPED-001-1",
+            "product_id": "SKU-GOLDEN-HEADPHONES",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "refund-shipped-not-delivered"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "replacement-inventory"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My headphones from ORD-REPLACE-STOCK-001 arrived broken. Can you send a replacement?",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 4,
+      "delivered_at": "2026-10-28T16:00:00Z",
+      "expected_policy": {
+        "action_type": "replacement",
+        "days_since_delivery": 4,
+        "decision": "eligible",
+        "delivered_on": "2026-10-28",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-REPLACE-STOCK-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible",
+              "replacement_in_stock"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2",
+              "RPL-6.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-REPLACE-STOCK-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "replacement_in_stock"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RPL-6.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-27"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Damaged item with available inventory: replacement eligible (RPL-6.2).",
+      "order_id": "ORD-REPLACE-STOCK-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "replacement",
+        "items": [
+          {
+            "available_inventory": 25,
+            "order_item_id": "ITEM-REPLACE-STOCK-001-1",
+            "product_id": "SKU-GOLDEN-HEADPHONES",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "replacement-in-stock"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "replacement-inventory"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "The desk lamp from ORD-REPLACE-NOSTOCK-001 arrived broken. Please replace it.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 4,
+      "delivered_at": "2026-10-28T16:00:00Z",
+      "expected_policy": {
+        "action_type": "replacement",
+        "days_since_delivery": 4,
+        "decision": "ineligible",
+        "delivered_on": "2026-10-28",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-REPLACE-NOSTOCK-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible",
+              "replacement_out_of_stock"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2",
+              "RPL-6.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-REPLACE-NOSTOCK-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "replacement_out_of_stock"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RPL-6.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-27"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Damaged item whose product has zero available inventory (RPL-6.2).",
+      "order_id": "ORD-REPLACE-NOSTOCK-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "replacement",
+        "items": [
+          {
+            "available_inventory": 0,
+            "order_item_id": "ITEM-REPLACE-NOSTOCK-001-1",
+            "product_id": "SKU-GOLDEN-DESK-LAMP",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "replacement-out-of-stock"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "replacement-inventory"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Can I swap the headphones from ORD-REPLACE-STOCK-001 for a new pair? I just want a fresh one.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 4,
+      "delivered_at": "2026-10-28T16:00:00Z",
+      "expected_policy": {
+        "action_type": "replacement",
+        "days_since_delivery": 4,
+        "decision": "ineligible",
+        "delivered_on": "2026-10-28",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "ineligible",
+            "order_item_id": "ITEM-REPLACE-STOCK-001-1",
+            "reason_codes": [
+              "replacement_requires_damage"
+            ],
+            "triggered_rule_ids": [
+              "RPL-6.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-REPLACE-STOCK-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "replacement_requires_damage"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RPL-6.1"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-27"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Replacement without damage is not offered (RPL-6.1), even though stock is available.",
+      "order_id": "ORD-REPLACE-STOCK-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "replacement",
+        "items": [
+          {
+            "available_inventory": 25,
+            "order_item_id": "ITEM-REPLACE-STOCK-001-1",
+            "product_id": "SKU-GOLDEN-HEADPHONES",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "replacement-requires-damage"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "returnability"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "Can I return both water bottles from ORD-RETURNABLE-001? I bought the wrong color.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 12,
+      "delivered_at": "2026-10-20T16:00:00Z",
+      "expected_policy": {
+        "action_type": "return",
+        "days_since_delivery": 12,
+        "decision": "eligible",
+        "delivered_on": "2026-10-20",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-RETURNABLE-001-1",
+            "reason_codes": [
+              "within_return_window"
+            ],
+            "triggered_rule_ids": [
+              "RET-3.1"
+            ]
+          }
+        ],
+        "order_id": "ORD-RETURNABLE-001",
+        "reason": "change_of_mind",
+        "reason_codes": [
+          "within_return_window"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": false,
+        "triggered_rule_ids": [
+          "RET-3.1"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-19"
+      },
+      "expected_refund": null,
+      "monetary_boundary": null,
+      "notes": "Returnable product, change of mind inside the window, both units.",
+      "order_id": "ORD-RETURNABLE-001",
+      "order_status": "delivered",
+      "phase3_fixture": null,
+      "request": {
+        "action_type": "return",
+        "items": [
+          {
+            "available_inventory": 200,
+            "order_item_id": "ITEM-RETURNABLE-001-1",
+            "product_id": "SKU-GOLDEN-WATER-BOTTLE",
+            "quantity": 2,
+            "returnable": true
+          }
+        ],
+        "reason": "change_of_mind"
+      },
+      "scenario_id": "returnable-change-of-mind-return"
+    },
+    {
+      "anchor_time": "2026-11-01T12:00:00Z",
+      "case_id": null,
+      "coverage": [
+        "phase3-base"
+      ],
+      "customer_id": "CUST-10",
+      "customer_request": "My coffee maker from ORD-TIMEOUT-COMMIT-001 arrived cracked. I want a refund.",
+      "dataset_version": "p2-v1",
+      "days_since_delivery": 6,
+      "delivered_at": "2026-10-26T16:00:00Z",
+      "expected_policy": {
+        "action_type": "refund",
+        "days_since_delivery": 6,
+        "decision": "eligible",
+        "delivered_on": "2026-10-26",
+        "evaluated_at": "2026-11-01T12:00:00Z",
+        "item_results": [
+          {
+            "decision": "eligible",
+            "order_item_id": "ITEM-TIMEOUT-COMMIT-001-1",
+            "reason_codes": [
+              "within_damage_window",
+              "damaged_item_eligible"
+            ],
+            "triggered_rule_ids": [
+              "DMG-4.1",
+              "DMG-4.2"
+            ]
+          }
+        ],
+        "order_id": "ORD-TIMEOUT-COMMIT-001",
+        "reason": "damaged_item",
+        "reason_codes": [
+          "within_damage_window",
+          "damaged_item_eligible",
+          "shipping_refundable"
+        ],
+        "ruleset_version": "synthetic-p1-2026.11",
+        "shipping_refundable": true,
+        "triggered_rule_ids": [
+          "DMG-4.1",
+          "DMG-4.2",
+          "RFD-2.2"
+        ],
+        "window_days": 30,
+        "window_ends_on": "2026-11-25"
+      },
+      "expected_refund": {
+        "allocated_discount_total": "0.00",
+        "any_capped": false,
+        "currency": "USD",
+        "eligible_items_total": "97.19",
+        "gross_amount_total": "89.99",
+        "items_refund_total": "97.19",
+        "lines": [
+          {
+            "allocated_discount": "0.00",
+            "cap_reduction": "0.00",
+            "capped_by_prior_amount_refund": false,
+            "eligible_amount": "97.19",
+            "gross_amount": "89.99",
+            "line_paid_total": "97.19",
+            "order_item_id": "ITEM-TIMEOUT-COMMIT-001-1",
+            "prior_refunded_amount": "0.00",
+            "quantity_previously_refunded": 0,
+            "quantity_purchased": 1,
+            "quantity_remaining": 1,
+            "quantity_selected": 1,
+            "refund_amount": "97.19",
+            "refundable_tax": "7.20",
+            "remaining_paid_amount": "97.19",
+            "unit_price": "89.99"
+          }
+        ],
+        "order_id": "ORD-TIMEOUT-COMMIT-001",
+        "refundable_tax_total": "7.20",
+        "rounding_policy": "half_up_to_cent",
+        "shipping_refund_amount": "6.99",
+        "total_refund_amount": "104.18"
+      },
+      "monetary_boundary": null,
+      "notes": "Base facts for the Phase 3 provider timeout-after-commit scenario. The case, action, and fault injection are Phase 3 fixtures; none are seeded in Phase 2.",
+      "order_id": "ORD-TIMEOUT-COMMIT-001",
+      "order_status": "delivered",
+      "phase3_fixture": {
+        "kind": "provider_timeout_after_commit",
+        "owner_customer_id": null,
+        "requesting_customer_id": null,
+        "reserved_case_id": "CASE-TIMEOUT-COMMIT-001"
+      },
+      "request": {
+        "action_type": "refund",
+        "items": [
+          {
+            "available_inventory": 40,
+            "order_item_id": "ITEM-TIMEOUT-COMMIT-001-1",
+            "product_id": "SKU-GOLDEN-COFFEE-MAKER",
+            "quantity": 1,
+            "returnable": true
+          }
+        ],
+        "reason": "damaged_item"
+      },
+      "scenario_id": "timeout-after-commit-base"
+    }
+  ],
+  "schema_version": 1
+}

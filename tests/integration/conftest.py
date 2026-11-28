@@ -28,9 +28,9 @@ from support_ops.config import (
     require_destructive_test_reset,
     resolve_test_database_url,
 )
+from support_ops.db.locks import TEST_DATABASE_LOCK_KEY
 from support_ops.db.session import create_db_engine
 
-TEST_DATABASE_LOCK_KEY: Final = 7_233_301_550_001
 LOCK_TIMEOUT: Final = "120s"
 
 
