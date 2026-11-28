@@ -69,8 +69,8 @@ Branch `feature/p0-bootstrap`. All Phase 0 "done when" criteria from architectur
   - **Database:** development PostgreSQL 17 (Supabase) with pgvector 0.8.2, as reported by `/health`.
   - **Gemini:** `AGENT_MODEL=gemini-3.5-flash-lite`; `EMBEDDING_MODEL=gemini-embedding-2` (observed default dimension 3072); accessed through Google's OpenAI-compatible endpoint via `openai-agents` 0.24.0 and `openai` 3.51.0. `JUDGE_MODEL` was not recorded (not exercised).
 
-## Phase 1: Domain foundation — IMPLEMENTED, PENDING VERIFICATION (not complete)
-Branch `feature/p1-domain`. Implementation is complete and verified locally: the Hypothesis dependency is locked and installed, the full unit/Hypothesis suite passed in Codespaces, and the full non-live suite (unit, Hypothesis, and PostgreSQL integration tests including the guarded migration round trip) passed on local Windows against the Supabase test database. Phase 1 stays **not complete** until GitHub Actions CI passes and the development-database migration and `/health` check are done; the development database has not been migrated. No Phase 1 code uses an LLM.
+## Phase 1: Domain foundation — COMPLETE
+Branch `feature/p1-domain`. All Phase 1 "done when" criteria from architecture §22.1 are met: unit and Hypothesis tests pass and no Phase 1 code uses an LLM. In addition, GitHub Actions CI passed on the final Phase 1 code and dependency graph, the full non-live suite (unit, Hypothesis, and PostgreSQL integration tests including the guarded migration round trip) passed on local Windows against the Supabase test database, the development database was migrated to `0002_create_domain_schema` (head), and `GET /health` returned HTTP 200 after the migration.
 
 - Built:
   - `src/support_ops/domain/`:
@@ -93,23 +93,25 @@ Branch `feature/p1-domain`. Implementation is complete and verified locally: the
   - Deferred: `AuthContext.permissions`, `ProposedAction`/authorization result contracts (first consumer is Phase 3), case state machine.
   - Test-database safety: every integration test session now holds a shared PostgreSQL advisory lock on the test database; the `destructive_db` round-trip test takes it exclusively (120 s `lock_timeout`), checks the database starts at Phase 1 head, downgrades to `0001_enable_pgvector`, restores head in a `finally`, and verifies the restoration. It and the `TRUNCATE` test are skipped unless `require_destructive_test_reset` passes. Constraint tests run inside always-rolled-back transactions.
   - **CHECK constraints and SQL NULL semantics:** the first real PostgreSQL constraint run showed that `ck_actions_status_matches_authorization_decision` accepted an `authorized` action with a NULL `authorization_decision`. Root cause: SQL three-valued logic. With a NULL decision, a branch such as `status IN (...) AND authorization_decision IN ('allow', 'requires_approval')` evaluates to UNKNOWN rather than FALSE, and PostgreSQL accepts a CHECK whose result is UNKNOWN; the same hole affected `denied`, `awaiting_approval`, and `rejected`. Fix (in both the ORM and migration `0002`, kept identical; `0002` was edited in place because it had not reached the development database or `develop`): every decision-bearing state now requires `authorization_decision IS NOT NULL` explicitly. Coverage now includes a NULL decision for every decision-bearing status, every valid status/decision combination, and representative mismatches. All other CHECKs that reference nullable columns were reviewed; they either use `IS [NOT] NULL`/`coalesce` (always TRUE or FALSE) or accept NULL intentionally, with presence enforced by a paired status constraint.
+  - **Released migration history:** `0002_create_domain_schema` has now been applied to the development database and is released migration history. It must not be edited further; every future schema change must be a new migration (`0003` onward).
   - Dependency: `hypothesis==6.170.15` added to the dev group (newest version confirmed on both public PyPI and the approved package source); its only runtime dependency, `sortedcontainers` 2.4.0, stays transitive (it is the latest release, so no constraint is needed). Existing direct pins and the nine transitive constraints are unchanged. No package-source configuration is in the repository.
 - Final verification:
   - **Dependencies:** locking and installation of the Hypothesis dev dependency completed: `hypothesis==6.170.15`, `sortedcontainers==2.4.0`.
   - **Codespaces:** full Phase 1 unit/Hypothesis suite: 323 passed. Ruff passed; Ruff format check passed; mypy (strict) passed with no issues in 19 source files.
   - **Test-database migration:** the corrected migration was reapplied to the Supabase test database through the guarded migration round trip (`0002` → `0001_enable_pgvector` → corrected `0002`).
   - **Local Windows, non-live suite against the Supabase test database:** 432 collected, 4 `live_llm` deselected, 428 selected, **428 passed** in about 33.35 s. The suite covers the Pydantic/domain tests, Hypothesis refund invariants, policy engine, action state machine, PostgreSQL schema/drift tests, PostgreSQL domain constraints, immutable refund-ledger trigger tests, the migration round trip, and the Phase 0 unit/integration tests.
+  - **Supabase test-database migration round trip** (part of that suite): Phase 1 head → `0001_enable_pgvector` → Phase 1 head passed, and pgvector remained installed throughout. Schema/drift, PostgreSQL constraints, immutable refund-ledger triggers, Pydantic/domain tests, Hypothesis properties, policy engine, state machine, and Phase 0 regression tests all passed.
   - The test database finished restored at Phase 1 head (`0002_create_domain_schema`). `APP_ENV` and `ALLOW_TEST_DATABASE_RESET` were removed from the environment after the run.
+  - **GitHub Actions CI:** passed on the final Phase 1 code and dependency graph, using its own ephemeral `pgvector/pgvector:pg17` service database (no Supabase database, no secrets, `live_llm` excluded).
+  - **Development database:** migration from `0001_enable_pgvector` to `0002_create_domain_schema` succeeded; final development Alembic revision: `0002_create_domain_schema (head)`.
+  - **Local FastAPI app:** started successfully after the migration; `GET /health` returned HTTP 200.
 - Earlier verification (before the dependency was installed; superseded by the final results above), local Windows with the existing `.venv`:
   - `ruff check .`: all checks passed; `ruff format --check .`: 46 files already formatted.
   - mypy (strict) on `src/`: no issues in 19 source files.
   - Unit tests excluding the Hypothesis module (`tests/unit`, `-m "not live_llm"`, `--ignore=tests/unit/domain/test_refund_calculator_properties.py`): 319 passed, including the offline migration-vs-ORM DDL comparison (23 tables, 330 column/constraint entries, 22 indexes, downgrade order, no `DROP EXTENSION`).
   - Refund invariants (`tests/unit/domain/refund_invariants.py`) exercised with a temporary random-input harness (20,000 seeded samples, not committed) in place of Hypothesis: all invariants held.
   - `pytest tests/integration --collect-only`: 86 tests collected.
-- Pending verification:
-  - GitHub Actions CI for Phase 1.
-  - Development-database migration (`tasks.ps1 migrate`) and `/health` check: only after CI is green. The development database has **not** been migrated yet.
-- Known gaps / follow-ups:
+- Known gaps / follow-ups (no open Phase 1 verification items):
   - Phase 2 must generate seed data that satisfies the trusted-fact invariants (for example `refunded_amount` ≥ the allocated paid share of `refunded_quantity`, payment status consistent with `amount_refunded`).
   - `audit_log` is append-only by convention only (no trigger); revisit in Phase 3 if required.
   - Return-label requirement, case transitions, approval thresholds, idempotency-key hashing, and FAILED-action retry policy are Phase 3+ decisions.
