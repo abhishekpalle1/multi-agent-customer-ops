@@ -19,7 +19,7 @@ Read both before any task. If a request conflicts with architecture.md, stop and
 - No Docker locally. Do not create docker-compose.yml or use testcontainers.
 - Local dev DB: hosted Supabase PostgreSQL + pgvector via DATABASE_URL
   (session pooler, sslmode=require). Tests use TEST_DATABASE_URL (separate project).
-- CI uses a `pgvector/pgvector:pg16` service container.
+- CI uses a `pgvector/pgvector:pg17` service container.
 
 ## Engineering conventions
 - Python 3.12, uv, FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, PostgreSQL + pgvector.
