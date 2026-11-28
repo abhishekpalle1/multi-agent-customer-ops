@@ -18,8 +18,8 @@ Each phase appends: what was built, decisions made, known gaps, verified version
 - Known gaps: Phase 0 not started; CI workflow, `tasks.ps1`, and Alembic setup are still to be built.
 - Verified versions: Supabase dev and test projects both run PostgreSQL 17.12 with the `vector` extension enabled and verified. Python/package and Gemini model versions to be recorded in Phase 0.
 
-## Phase 0: Repository bootstrap — IMPLEMENTED, PENDING EXTERNAL VERIFICATION (not complete)
-Branch `feature/p0-bootstrap`. Phase 0 stays pending until both of the following pass: (1) GitHub Actions CI, and (2) the Gemini live smoke tests (`make test-live` / `tasks.ps1 test-live`). The Codespaces results under "Verification" were obtained with the **previous** dependency set; after the dependency realignment below, `uv.lock` must be regenerated and that verification re-run.
+## Phase 0: Repository bootstrap — COMPLETE
+Branch `feature/p0-bootstrap`. All Phase 0 "done when" criteria from architecture §22.1 are met: the app connects to the development database, the Alembic migration is at head, `/health` returns 200 with database and pgvector checks, integration tests run against `TEST_DATABASE_URL` only, ruff/mypy/pytest pass, GitHub Actions CI passes on its own ephemeral PostgreSQL 17 + pgvector, and the Gemini live smoke test passes. Model and package versions are recorded below.
 
 - Built:
   - `pyproject.toml` (uv, Python 3.12, `src/` layout, ruff/mypy/pytest config), `.python-version`, `.env.example` (blank placeholders only), minimal `README.md`.
@@ -43,26 +43,28 @@ Branch `feature/p0-bootstrap`. Phase 0 stays pending until both of the following
   - Agents SDK trace export is disabled in the runtime (`set_tracing_disabled(True)`) because the default exporter targets OpenAI's platform; tracing is Phase 6/7.
   - Embeddings request `encoding_format="float"` explicitly (the `openai` client otherwise defaults to base64).
   - No live-LLM GitHub Actions workflow in Phase 0; live tests run locally via `tasks.ps1 test-live` / `make test-live`.
-- Verification:
-  - **Windows laptop (static only):** the laptop's network blocks `files.pythonhosted.org` (TLS handshake fails from uv, PowerShell, and curl; `pypi.org` is reachable), so dependencies cannot be installed there. No internal package index was used or configured. Executed successfully there: `py_compile`/AST parse of all Python files (CPython 3.12.12); TOML parse of `pyproject.toml`; YAML parse of `ci.yml`;   `tasks.ps1` parse plus a dry run of every task against a `uv` argument-echo shim; `ruff check` and `ruff format --check` with the official ruff 0.17.6 binary (SHA-256 verified), and again with the official ruff 0.17.5 binary (SHA-256 verified) after the dependency realignment, both passing.
-    - **GitHub Codespaces (uv 0.13.9, Python 3.12.3), executed successfully with the previous dependency set (fastapi 0.165.0, openai-agents 0.26.0, openai 3.60.0, ...; superseded, must be re-run):**
-    - `uv lock` resolved 68 packages from public PyPI. `uv.lock` was scanned: no CNA Artifactory, `cna.com`, JFrog, Supabase host/project reference, password, or token.
-    - `uv sync --locked` installed 64 packages.
-    - `make lint`: `ruff check .` passed; `ruff format --check .` reported 23 files already formatted.
-    - `make typecheck`: mypy (strict) reported no issues in 10 source files.
-    - `make test-unit`: 34 passed.
-    - `make migrate` against the Supabase development database: Alembic applied `0001_enable_pgvector`.
-    - Running app `GET /health`: HTTP 200; app = ok, database = ok, pgvector = ok; pgvector version 0.8.2.
-    - `make test` (run twice, both passed): 40 collected, 4 `live_llm` deselected, 36 selected, 36 passed. The integration health tests ran against `TEST_DATABASE_URL`.
-- Known gaps / pending verification:
-  - **`uv.lock` is stale:** the committed lock (`02eb524`, 68 packages, public PyPI) resolves the current direct pins but predates the transitive constraint dependencies, so it still records the nine uncapped versions and every `--locked` command fails until it is regenerated from public PyPI (Codespaces) and committed. After regeneration, re-run lint, type-check, unit/integration tests, migration, and `/health` with the new dependency set.
-  - **Mirror availability of the resolved graph:** the direct pins and the nine capped transitive versions have been confirmed on the approved mirror. After regeneration, repeat the full lock-to-mirror comparison and confirm zero gaps before installing locally.
-  - **GitHub Actions CI: not yet verified.**
-  - **Gemini live smoke tests: created, not executed.** Model IDs not yet recorded; embedding vector dimension not yet observed. (Final embedding model, output dimension, pgvector column/index settings, and chunking are Phase 4 decisions.)
+- Verification (final; dependency graph from `uv.lock` at `45895b7`):
+  - **Local Windows (CPython 3.12.12):** the final constrained dependency graph installed into the local `.venv` from the approved package source (no package-source configuration is stored in the repository).
+    - `ruff check .` passed; `ruff format --check .`: 23 files already formatted.
+    - mypy (strict): no issues in 10 source files.
+    - Non-live suite (`-m "not live_llm"`): 40 collected, 4 `live_llm` deselected, 36 selected, 36 passed (unit tests plus integration tests against `TEST_DATABASE_URL`).
+    - Alembic connected to the development PostgreSQL database and confirmed it is at head (`0001_enable_pgvector`).
+    - Local FastAPI `GET /health`: HTTP 200; app = ok, database = ok, pgvector = ok; pgvector version 0.8.2.
+  - **Gemini live smoke test (local, `-m live_llm`):** 4 passed, 36 deselected, about 5.74 s, with `AGENT_MODEL=gemini-3.5-flash-lite` and `EMBEDDING_MODEL=gemini-embedding-2`. Basic generation, Pydantic structured output (`output_type`), function-tool calling through the Agents SDK `Runner`, and one embedding request all passed. Observed embedding dimension: 3072.
+  - **GitHub Actions CI:** the latest run on the final dependency graph passed, including lint, type-check, migration, and tests. It used its own ephemeral `pgvector/pgvector:pg17` service, no Supabase database, and no secrets, with `live_llm` excluded.
+  - **Earlier verification (superseded by the final results above):**
+    - Windows static checks before dependencies could be installed (public package downloads were blocked on that network): `py_compile`/AST parse of all Python files, TOML and YAML parses, `tasks.ps1` parse plus a dry run of every task against a `uv` argument-echo shim, and `ruff check` / `ruff format --check` with the official ruff 0.17.6 and 0.17.5 binaries (SHA-256 verified). All passed.
+    - GitHub Codespaces (uv 0.13.9, Python 3.12.3) with the initial dependency set (fastapi 0.165.0, openai-agents 0.26.0, openai 3.60.0, ...): `uv lock` (68 packages, public PyPI; scanned clean of internal package-index references, Supabase host/project references, passwords, and tokens), `uv sync --locked`, lint, mypy, unit tests (34 passed), `make migrate` (applied `0001_enable_pgvector`), `/health` 200 (pgvector 0.8.2), and `make test` (36 passed, twice).
+- Known gaps / follow-ups (no open Phase 0 verification items):
+  - Embedding dimension 3072 is recorded only as the observed default output of `gemini-embedding-2` in the Phase 0 smoke test. The final Phase 4 RAG embedding model, output dimension, pgvector column dimension, and index configuration (HNSW/IVFFlat) remain a benchmark-driven Phase 4 decision; nothing in Phase 0 fixes them.
+  - `JUDGE_MODEL` is configurable but not exercised in Phase 0.
+  - Live provider tests are not part of PR CI by design; a manual/scheduled `live_llm` workflow is out of Phase 0 scope.
+  - The nine `[tool.uv] constraint-dependencies` caps are a maintenance item: remove each once the approved package source carries the newer release, then regenerate `uv.lock` from public PyPI and re-verify.
+  - On networks that block public PyPI package downloads, `tasks.ps1 install` (`uv sync --locked`) cannot fetch packages; there the locked graph is installed from the approved package source instead.
 - Versions:
   - **Direct dependencies (pinned in `pyproject.toml`):** fastapi 0.162.7, uvicorn 0.54.0, pydantic 2.14.3, pydantic-settings 2.16.3, sqlalchemy 2.0.57, psycopg[binary] 3.3.9, alembic 1.20.1, openai-agents 0.24.0, openai 3.51.0; dev group: pytest 9.2.0, pytest-asyncio 1.5.0, httpx 0.28.1, ruff 0.17.5, mypy 2.4.1.
   - **Transitive constraint dependencies (`[tool.uv] constraint-dependencies`):** annotated-doc 0.0.6, certifi 2026.10.23, charset-normalizer 3.5.2, httpcore2 2.16.0, httpx2 2.16.0, librt 0.16.0, packaging 26.3, python-multipart 0.0.33, sse-starlette 3.7.0.
-  - **Resolved dependency graph (`uv.lock`):** pending regeneration with the constraint dependencies above. The committed lock (`02eb524`, 68 packages from public PyPI) matches the direct pins but still records the uncapped transitive versions (annotated-doc 0.0.7, certifi 2026.11.20, charset-normalizer 3.5.3, httpcore2 2.16.2, httpx2 2.16.2, librt 0.17.0, packaging 26.4, python-multipart 0.0.34, sse-starlette 3.7.1). Once regenerated, `uv.lock` is the authoritative record of every exact resolved version; individual resolved versions are not duplicated here.
-  - **Toolchain:** uv 0.13.9 (Windows and Codespaces); CPython 3.12.12 (Windows) and 3.12.3 (Codespaces); ruff 0.17.5 (dev pin). CI pins uv 0.13.9, `actions/checkout@v7`, `astral-sh/setup-uv@v10.4.0`, `pgvector/pgvector:pg17`.
-  - **Database:** Supabase development PostgreSQL 17 with pgvector 0.8.2 (reported by `/health`).
-  - **Gemini model IDs:** not yet recorded (live tests not run).
+  - **Resolved dependency graph (`uv.lock`, `45895b7`):** 68 packages, all resolved from public PyPI (`https://pypi.org/simple`). It includes the direct pins and the nine constrained transitive versions, records the nine constraints in its manifest, and every version is also available from the approved package source. `uv.lock` is the authoritative record of every exact resolved version; individual versions are not duplicated here.
+  - **Toolchain:** uv 0.13.9; CPython 3.12.12 (local Windows, final verification) and 3.12.3 (Codespaces, earlier verification); ruff 0.17.5. CI pins uv 0.13.9, `actions/checkout@v7`, `astral-sh/setup-uv@v10.4.0`, `pgvector/pgvector:pg17`.
+  - **Database:** development PostgreSQL 17 (Supabase) with pgvector 0.8.2, as reported by `/health`.
+  - **Gemini:** `AGENT_MODEL=gemini-3.5-flash-lite`; `EMBEDDING_MODEL=gemini-embedding-2` (observed default dimension 3072); accessed through Google's OpenAI-compatible endpoint via `openai-agents` 0.24.0 and `openai` 3.51.0. `JUDGE_MODEL` was not recorded (not exercised).
