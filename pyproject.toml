@@ -25,6 +25,22 @@ dev = [
     "ruff==0.17.5",
 ]
 
+[tool.uv]
+# Resolution-only caps on transitive packages (not direct dependencies). uv.lock is still
+# resolved from public PyPI; these keep every locked version available on the approved
+# local package mirror. Remove a cap once the mirror carries the newer release.
+constraint-dependencies = [
+    "annotated-doc==0.0.6",
+    "certifi==2026.10.23",
+    "charset-normalizer==3.5.2",
+    "httpcore2==2.16.0",
+    "httpx2==2.16.0",
+    "librt==0.16.0",
+    "packaging==26.3",
+    "python-multipart==0.0.33",
+    "sse-starlette==3.7.0",
+]
+
 [build-system]
 requires = ["uv_build>=0.13.9,<0.14.0"]
 build-backend = "uv_build"
