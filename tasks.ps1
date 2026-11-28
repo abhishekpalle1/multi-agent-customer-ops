@@ -10,7 +10,8 @@
 param(
     [Parameter(Position = 0)]
     [ValidateSet('help', 'lock', 'install', 'migrate', 'run', 'lint', 'format', 'typecheck',
-        'test', 'test-unit', 'test-live', 'check')]
+        'test', 'test-unit', 'test-live', 'check', 'synthetic-validate', 'synthetic-manifest',
+        'seed-dev', 'reset-seed-dev', 'seed-test', 'reset-seed-test')]
     [string]$Task = 'help'
 )
 
@@ -47,6 +48,17 @@ Usage: .\tasks.ps1 <task>
   test-unit   Unit tests only (no network, database, or LLM)
   test-live   Live Gemini smoke tests (-m live_llm); needs GEMINI_API_KEY
   check       lint + typecheck + test
+
+Synthetic data (dataset p2-v1; never run by check/test/migrate):
+  synthetic-validate  Generate + validate in memory, check the committed manifest (no DB)
+  synthetic-manifest  Regenerate data/golden/scenarios.json
+  seed-dev            Seed DATABASE_URL if empty; no-op if identical; else refuse
+                      (requires APP_ENV=development)
+  reset-seed-dev      DESTRUCTIVE: truncate + reseed DATABASE_URL in one transaction
+                      (requires APP_ENV=development and ALLOW_DEV_DATABASE_RESET=true)
+  seed-test           Seed TEST_DATABASE_URL if empty; no-op if identical; else refuse
+  reset-seed-test     DESTRUCTIVE: truncate + reseed TEST_DATABASE_URL
+                      (requires ALLOW_TEST_DATABASE_RESET=true)
 '@ | Write-Host
 }
 
@@ -75,6 +87,16 @@ try {
             Invoke-Uv run --locked ruff format --check .
             Invoke-Uv run --locked mypy
             Invoke-WithTestEnv { Invoke-Uv run --locked pytest -m 'not live_llm' }
+        }
+        'synthetic-validate' { Invoke-Uv run --locked python -m support_ops.synthetic validate }
+        'synthetic-manifest' { Invoke-Uv run --locked python -m support_ops.synthetic manifest }
+        'seed-dev' { Invoke-Uv run --locked python -m support_ops.synthetic seed --target development }
+        'reset-seed-dev' { Invoke-Uv run --locked python -m support_ops.synthetic reset-seed --target development }
+        'seed-test' {
+            Invoke-WithTestEnv { Invoke-Uv run --locked python -m support_ops.synthetic seed --target test }
+        }
+        'reset-seed-test' {
+            Invoke-WithTestEnv { Invoke-Uv run --locked python -m support_ops.synthetic reset-seed --target test }
         }
     }
 }

@@ -6,8 +6,11 @@ from support_ops.config import (
     DEFAULT_GEMINI_OPENAI_BASE_URL,
     DatabaseConfigError,
     Settings,
+    UnsafeDevelopmentDatabaseError,
     UnsafeTestDatabaseError,
+    require_destructive_dev_reset,
     require_destructive_test_reset,
+    resolve_development_database_url,
     resolve_test_database_url,
 )
 
@@ -224,3 +227,60 @@ def test_destructive_reset_conditions_parse_from_environment(
 def test_destructive_reset_refused(overrides: dict[str, object], expected: str) -> None:
     with pytest.raises(UnsafeTestDatabaseError, match=expected):
         require_destructive_test_reset(_reset_settings(**overrides))
+
+
+def _dev_settings(**overrides: object) -> Settings:
+    values: dict[str, object] = {
+        "database_url": DEV_URL,
+        "test_database_url": TEST_URL,
+        "app_env": "development",
+        "allow_dev_database_reset": True,
+    }
+    values.update(overrides)
+    return make_settings(**values)
+
+
+def test_destructive_dev_reset_allowed_when_all_conditions_hold() -> None:
+    assert require_destructive_dev_reset(_dev_settings()).username == "postgres.devref"
+
+
+def test_destructive_dev_reset_allowed_without_a_test_database_configured() -> None:
+    resolved = require_destructive_dev_reset(_dev_settings(test_database_url=None))
+
+    assert resolved.username == "postgres.devref"
+
+
+def test_destructive_dev_reset_conditions_parse_from_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("DATABASE_URL", DEV_URL)
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("ALLOW_DEV_DATABASE_RESET", "true")
+
+    assert require_destructive_dev_reset(Settings(_env_file=None)).username == "postgres.devref"
+
+
+@pytest.mark.parametrize(
+    ("overrides", "error", "expected"),
+    [
+        ({"app_env": "test"}, UnsafeDevelopmentDatabaseError, "APP_ENV=development"),
+        (
+            {"allow_dev_database_reset": False},
+            UnsafeDevelopmentDatabaseError,
+            "ALLOW_DEV_DATABASE_RESET=true",
+        ),
+        ({"database_url": None}, DatabaseConfigError, "DATABASE_URL is not set"),
+        ({"test_database_url": DEV_URL}, UnsafeDevelopmentDatabaseError, "same logical database"),
+    ],
+    ids=["app-env-test", "reset-not-allowed", "dev-url-unset", "dev-url-is-test"],
+)
+def test_destructive_dev_reset_refused(
+    overrides: dict[str, object], error: type[Exception], expected: str
+) -> None:
+    with pytest.raises(error, match=expected):
+        require_destructive_dev_reset(_dev_settings(**overrides))
+
+
+def test_development_writes_require_app_env_development() -> None:
+    with pytest.raises(UnsafeDevelopmentDatabaseError, match="APP_ENV=development"):
+        resolve_development_database_url(_dev_settings(app_env="test"))
